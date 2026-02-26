@@ -12,30 +12,50 @@ const getAvailability = (dateStr) => {
   return "available";
 };
 
+// Operating hours: 10:00 AM – 10:00 PM
 const SLOT_GROUPS = [
   {
     period: "MORNING",
     emoji: "☀️",
-    slots: [
-      { time: "7:00 AM", endTime: "9:00 AM" },
-      { time: "9:00 AM", endTime: "11:00 AM" },
-      { time: "11:00 AM", endTime: "1:00 PM" },
-    ],
+    slots: ["10:00 AM", "11:00 AM"],
   },
   {
     period: "AFTERNOON",
-    emoji: "☀️",
-    slots: [
-      { time: "1:00 PM", endTime: "3:00 PM" },
-      { time: "3:00 PM", endTime: "5:00 PM" },
-    ],
+    emoji: "🌤️",
+    slots: ["12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"],
   },
   {
     period: "EVENING",
     emoji: "🌅",
-    slots: [{ time: "5:00 PM", endTime: "7:00 PM" }],
+    slots: ["5:00 PM", "6:00 PM", "7:00 PM", "8:00 PM"],
   },
 ];
+
+/** Convert "10:00 AM" / "2:00 PM" to 24-hour integer */
+function slotToHour(timeStr) {
+  const [time, meridian] = timeStr.split(" ");
+  let h = parseInt(time.split(":")[0], 10);
+  if (meridian === "PM" && h !== 12) h += 12;
+  if (meridian === "AM" && h === 12) h = 0;
+  return h;
+}
+
+/** Add `hours` to a time string, return formatted string */
+function addHours(timeStr, hours) {
+  const r = slotToHour(timeStr) + hours;
+  if (r === 0) return "12:00 AM";
+  if (r < 12) return `${r}:00 AM`;
+  if (r === 12) return "12:00 PM";
+  return `${r - 12}:00 PM`;
+}
+
+/** Format a 24-hour integer to display string */
+function formatHour(h) {
+  if (h <= 0) return "12:00 AM";
+  if (h < 12) return `${h}:00 AM`;
+  if (h === 12) return "12:00 PM";
+  return `${h - 12}:00 PM`;
+}
 
 const MONTHS = [
   "January","February","March","April","May","June",
@@ -66,6 +86,28 @@ export default function Schedule({ onNext, onBack }) {
   const [calMonth, setCalMonth] = useState(today.getMonth());
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [selectedSlot, setSelectedSlot] = useState(null);
+
+  // Duration chosen in previous step (default 2 hrs)
+  const storedDuration = parseInt(
+    JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}").duration || "2",
+    10
+  );
+
+  // 4-hour advance booking rule
+  const now = new Date();
+  const currentDecimalHour = now.getHours() + now.getMinutes() / 60;
+  const earliestDecimalHour = currentDecimalHour + 4; // must book ≥4 hrs ahead
+  const earliestDisplayHour = Math.ceil(earliestDecimalHour); // round up to next full hour
+
+  // Last allowed start = 22:00 (10 PM) minus duration
+  const latestStartHour = 22 - storedDuration;
+
+  const isSlotLocked = (timeStr) => {
+    const h = slotToHour(timeStr);
+    if (selectedDate === todayStr && h < earliestDecimalHour) return "too-soon";
+    if (h > latestStartHour) return "too-late";
+    return false;
+  };
 
   const days = useMemo(() => {
     const firstDay = new Date(calYear, calMonth, 1).getDay();
@@ -237,7 +279,26 @@ export default function Schedule({ onNext, onBack }) {
             </svg>
             <span className="font-bold text-slate-900 text-base">Select Start Time</span>
           </div>
-          <p className="text-slate-400 text-xs mb-4">Booked slots are grayed out</p>
+          <p className="text-slate-400 text-xs mb-3">Slots run 10:00 AM – 10:00 PM (PKT)</p>
+
+          {/* 4-hour advance notice — shown only when today is selected */}
+          {selectedDate === todayStr && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 flex items-start gap-2 mb-4">
+              <svg viewBox="0 0 20 20" width={16} height={16} fill="none" stroke="#d97706" strokeWidth={1.8} className="flex-shrink-0 mt-0.5">
+                <circle cx="10" cy="10" r="8" />
+                <path d="M10 6v4l2.5 2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <p className="text-amber-800 text-xs leading-snug">
+                Bookings require <span className="font-bold">4 hours advance notice.</span>{" "}
+                Earliest available slot today:{" "}
+                <span className="font-bold">
+                  {earliestDisplayHour >= 22
+                    ? "No slots available today — please select another date"
+                    : formatHour(earliestDisplayHour)}
+                </span>
+              </p>
+            </div>
+          )}
 
           {SLOT_GROUPS.map((group) => (
             <div key={group.period} className="mb-4">
@@ -248,24 +309,40 @@ export default function Schedule({ onNext, onBack }) {
                 </span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {group.slots.map((slot) => {
-                  const isActive = selectedSlot?.time === slot.time;
+                {group.slots.map((slotTime) => {
+                  const endTime = addHours(slotTime, storedDuration);
+                  const locked = isSlotLocked(slotTime);
+                  const isActive = selectedSlot?.time === slotTime;
                   return (
                     <button
-                      key={slot.time}
-                      onClick={() => setSelectedSlot(slot)}
+                      key={slotTime}
+                      disabled={!!locked}
+                      onClick={() => setSelectedSlot({ time: slotTime, endTime })}
                       className={[
-                        "rounded-xl border-2 px-4 py-3 font-bold text-sm transition text-center",
+                        "rounded-xl border-2 px-4 py-3 font-bold text-sm transition text-center relative",
                         isActive
                           ? "bg-teal-700 border-teal-700 text-white"
+                          : locked
+                          ? "bg-slate-50 border-slate-200 text-slate-300 cursor-not-allowed"
                           : "bg-white border-slate-200 text-slate-800 hover:border-teal-300",
                       ].join(" ")}
                     >
-                      {slot.time}
+                      <span className="flex items-center gap-1 justify-center">
+                        {locked && (
+                          <svg viewBox="0 0 16 16" width={12} height={12} fill="none" stroke="#cbd5e1" strokeWidth={1.8}>
+                            <rect x="3" y="7" width="10" height="7" rx="1.5" />
+                            <path d="M5 7V5a3 3 0 0 1 6 0v2" strokeLinecap="round" />
+                          </svg>
+                        )}
+                        {slotTime}
+                      </span>
                       {isActive && (
                         <div className="text-teal-200 text-xs font-normal mt-0.5">
-                          until {slot.endTime}
+                          until {endTime}
                         </div>
+                      )}
+                      {locked === "too-late" && (
+                        <div className="text-slate-300 text-xs font-normal mt-0.5">ends after 10 PM</div>
                       )}
                     </button>
                   );
