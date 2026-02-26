@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import TopBar from "../components/TopBar";
 
 const CHECK_ITEMS = [
-  "Wheelchair accessible van with hydraulic ramp",
+  "NPS Authorized Wheelchair Accessible Vans",
   "Trained driver assists with boarding and exit",
   "Secured wheelchair locking system in van",
   "Pre-booked 2\u20134 hour time slots",
