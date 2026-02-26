@@ -147,7 +147,11 @@ export default function Duration({ onNext, onBack }) {
         </div>
         <button
           className="w-full bg-teal-700 text-white font-bold text-base rounded-2xl py-4 hover:bg-teal-800 transition"
-          onClick={() => onNext ? onNext(selected) : navigate("/booking/schedule")}
+          onClick={() => {
+            const existing = JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}");
+            localStorage.setItem("mayaCabsBooking", JSON.stringify({ ...existing, duration: selected, total: selected * 2500 }));
+            if (onNext) onNext(selected); else navigate("/booking/schedule");
+          }}
         >
           Continue to Schedule →
         </button>

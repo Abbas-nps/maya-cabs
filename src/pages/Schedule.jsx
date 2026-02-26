@@ -298,8 +298,9 @@ export default function Schedule({ onNext, onBack }) {
           ].join(" ")}
           onClick={() => {
             if (!selectedSlot) return;
-            if (onNext) onNext(selectedDate, selectedSlot);
-            else navigate("/booking/details");
+            const existing = JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}");
+            localStorage.setItem("mayaCabsBooking", JSON.stringify({ ...existing, date: selectedDate, slotTime: selectedSlot.time, slotEnd: selectedSlot.endTime }));
+            if (onNext) onNext(selectedDate, selectedSlot); else navigate("/booking/details");
           }}
         >
           Confirm Date &amp; Time →

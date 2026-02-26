@@ -211,8 +211,9 @@ export default function Details({ onNext, onBack }) {
           ].join(" ")}
           onClick={() => {
             if (!allValid) return;
-            if (onNext) onNext({ wheelchairType, fullName, phone });
-            else navigate("/booking/review");
+            const existing = JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}");
+            localStorage.setItem("mayaCabsBooking", JSON.stringify({ ...existing, wheelchairType, fullName, phone }));
+            if (onNext) onNext({ wheelchairType, fullName, phone }); else navigate("/booking/review");
           }}
         >
           {allValid ? "Continue to Review →" : "Fill in all required fields"}

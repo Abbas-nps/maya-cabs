@@ -5,6 +5,8 @@ import About from "./pages/About";
 import Duration from "./pages/Duration";
 import Schedule from "./pages/Schedule";
 import Details from "./pages/Details";
+import Review from "./pages/Review";
+import Payment from "./pages/Payment";
 
 export default function App() {
   return (
@@ -16,6 +18,8 @@ export default function App() {
         <Route path="/booking/duration" element={<Duration />} />
         <Route path="/booking/schedule" element={<Schedule />} />
         <Route path="/booking/details" element={<Details />} />
+        <Route path="/booking/review" element={<Review />} />
+        <Route path="/booking/payment" element={<Payment />} />
       </Routes>
     </Router>
   );
