@@ -1,14 +1,22 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Landing from "./pages/Landing.tsx";
-import BookingFlow from "./pages/BookingFlow.jsx";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Duration from "./pages/Duration";
+import Schedule from "./pages/Schedule";
+import Details from "./pages/Details";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/book" element={<BookingFlow />} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/booking/duration" element={<Duration />} />
+        <Route path="/booking/schedule" element={<Schedule />} />
+        <Route path="/booking/details" element={<Details />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }

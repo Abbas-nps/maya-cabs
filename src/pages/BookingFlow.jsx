@@ -16,6 +16,7 @@ export default function BookingFlow() {
     needReturn: false,
     selectedSlot: null,
     date: "", // Add date field
+    duration: 2, // Default duration in hours (can be set in previous step)
   });
 
   // Ensure booking.date is set (default to today)
@@ -92,7 +93,8 @@ export default function BookingFlow() {
           setBooking={setBooking}
           selectedDate={booking.date}
           routeServiceable={true} // For now, always true
-          goNextStep={() => setStep(5)}
+          onBack={() => setStep(3)}
+          onNext={() => setStep(5)}
         />
       )}
     </div>

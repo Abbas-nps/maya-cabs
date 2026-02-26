@@ -47,9 +47,20 @@ export default function TimeSelectionWindow({ booking, setBooking, next, back, A
   }
 
   function handleSelectSlot(slot) {
+    console.log('[TimeSelectionWindow] Slot clicked:', slot);
     setBooking({ ...booking, selectedSlot: slot });
-    next();
+    setTimeout(() => {
+      console.log('[TimeSelectionWindow] booking after setBooking:', booking);
+    }, 0);
+    if (typeof next === 'function') {
+      console.log('[TimeSelectionWindow] next called');
+      next();
+    }
   }
+
+  React.useEffect(() => {
+    console.log('[TimeSelectionWindow] booking prop changed:', booking);
+  }, [booking]);
 
   return (
     <div>
