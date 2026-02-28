@@ -35,6 +35,9 @@ export default function Review({ onNext, onBack }) {
     : "—";
   const passenger = booking.fullName || "—";
   const phone = booking.phone || "—";
+  const pickup = booking.pickup || "—";
+  const destination = booking.destination || "—";
+  const tripType = booking.tripType === "one-way" ? "One-Way" : booking.tripType === "wait-return" ? "Wait & Return" : "—";
   const wheelchair = booking.wheelchairType === "standard"
     ? "Standard Width (up to 24 in)"
     : booking.wheelchairType === "wide"
@@ -72,7 +75,9 @@ export default function Review({ onNext, onBack }) {
             <Row label="Date" value={date} />
             <Row label="Time Slot" value={timeSlot} />
             <Row label="Duration" value={`${duration} hours`} />
-            <Row label="Service Area" value="Lahore (door-to-door)" />
+            <Row label="Pickup" value={pickup} />
+            <Row label="Destination" value={destination} />
+            <Row label="Trip Type" value={tripType} />
           </div>
         </div>
 

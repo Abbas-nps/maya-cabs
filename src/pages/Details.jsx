@@ -25,11 +25,21 @@ const WHEELCHAIR_OPTIONS = [
 export default function Details({ onNext, onBack }) {
   const navigate = useNavigate();
   const [wheelchairType, setWheelchairType] = useState("");
+  const [pickup, setPickup] = useState("");
+  const [destination, setDestination] = useState("");
+  const [tripType, setTripType] = useState(""); // "one-way" | "wait-return"
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [notEmergency, setNotEmergency] = useState(false);
 
-  const allValid = wheelchairType && fullName.trim() && phone.trim() && notEmergency;
+  const allValid =
+    wheelchairType &&
+    pickup.trim() &&
+    destination.trim() &&
+    tripType &&
+    fullName.trim() &&
+    phone.trim() &&
+    notEmergency;
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col">
@@ -99,6 +109,80 @@ export default function Details({ onNext, onBack }) {
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        {/* Journey Details card */}
+        <div className="bg-white rounded-2xl shadow-sm mb-4 overflow-hidden">
+          <div className="px-4 pt-4 pb-3 flex items-center gap-3">
+            <div className="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke="#0d9488" strokeWidth={1.8}>
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                <circle cx="12" cy="9" r="2.5" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <span className="font-bold text-slate-900 text-base">Journey Details</span>
+            </div>
+            <span className="text-red-500 font-bold text-sm">Required</span>
+          </div>
+          <p className="px-4 pb-3 text-slate-500 text-sm">
+            Where are we picking you up and where are we going?
+          </p>
+          <div className="px-4 pb-4 flex flex-col gap-3">
+            <div>
+              <label className="block text-slate-700 text-xs font-semibold mb-1">
+                Pickup Location <span className="text-red-500">*</span>
+              </label>
+              <input
+                className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm focus:border-teal-500 outline-none transition"
+                placeholder="e.g. 15-B Model Town, Lahore"
+                value={pickup}
+                onChange={(e) => setPickup(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-slate-700 text-xs font-semibold mb-1">
+                Destination <span className="text-red-500">*</span>
+              </label>
+              <input
+                className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm focus:border-teal-500 outline-none transition"
+                placeholder="e.g. Services Hospital, Lahore"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-slate-700 text-xs font-semibold mb-2">
+                Trip Type <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-3">
+                {[
+                  { id: "one-way", label: "One-Way", desc: "Drop off only" },
+                  { id: "wait-return", label: "Wait & Return", desc: "Driver waits & brings back" },
+                ].map((t) => {
+                  const isSel = tripType === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => setTripType(t.id)}
+                      className={[
+                        "flex-1 text-left rounded-2xl border-2 px-3 py-3 flex flex-col gap-1 transition",
+                        isSel ? "border-teal-500 bg-teal-50" : "border-slate-200 bg-white",
+                      ].join(" ")}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <div className={["w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0", isSel ? "border-teal-600 bg-teal-600" : "border-slate-300"].join(" ")}>
+                          {isSel && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                        </div>
+                        <span className="font-bold text-slate-900 text-sm">{t.label}</span>
+                      </div>
+                      <span className="text-slate-500 text-xs pl-5">{t.desc}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -212,8 +296,8 @@ export default function Details({ onNext, onBack }) {
           onClick={() => {
             if (!allValid) return;
             const existing = JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}");
-            localStorage.setItem("mayaCabsBooking", JSON.stringify({ ...existing, wheelchairType, fullName, phone }));
-            if (onNext) onNext({ wheelchairType, fullName, phone }); else navigate("/booking/review");
+            localStorage.setItem("mayaCabsBooking", JSON.stringify({ ...existing, wheelchairType, pickup, destination, tripType, fullName, phone }));
+            if (onNext) onNext({ wheelchairType, pickup, destination, tripType, fullName, phone }); else navigate("/booking/review");
           }}
         >
           {allValid ? "Continue to Review →" : "Fill in all required fields"}

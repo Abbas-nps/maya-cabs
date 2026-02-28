@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import Stepper from "../components/Stepper";
+import { supabase } from "../supabase";
 
 // ── Replace with Maya Cabs WhatsApp number (with country code, no + or spaces) ──
 const WHATSAPP_NUMBER = "923396292222";
@@ -37,7 +38,10 @@ function buildWhatsAppMessage(booking) {
     `⏰ Time: ${timeSlot}\n` +
     `⌛ Duration: ${duration} hours\n` +
     `♿ Wheelchair: ${wheelchair}\n` +
-    `👤 Passenger: ${passenger}\n` +
+    `� Pickup: ${booking.pickup || "—"}\n` +
+    `🏁 Destination: ${booking.destination || "—"}\n` +
+    `🔄 Trip Type: ${booking.tripType === "wait-return" ? "Wait & Return" : "One-Way"}\n` +
+    `�👤 Passenger: ${passenger}\n` +
     `📞 Phone: ${phone}\n` +
     `💰 Total: PKR ${Number(total).toLocaleString()} (prepaid)\n\n` +
     `Please confirm availability. Thank you!`
@@ -57,7 +61,26 @@ export default function Payment({ onBack }) {
       ? `${booking.slotTime} → ${booking.slotEnd}`
       : "—";
 
-  const handleWhatsApp = () => {
+  const handleWhatsApp = async () => {
+    // Save to Supabase (non-blocking — WhatsApp flow continues regardless)
+    try {
+      await supabase.from("bookings").insert({
+        passenger_name: booking.fullName || null,
+        passenger_phone: booking.phone || null,
+        pickup: booking.pickup || null,
+        destination: booking.destination || null,
+        trip_type: booking.tripType || null,
+        wheelchair_type: booking.wheelchairType || null,
+        booking_date: booking.date || null,
+        slot_time: booking.slotTime || null,
+        slot_end: booking.slotEnd || null,
+        duration: booking.duration ? Number(booking.duration) : null,
+        total_pkr: booking.total ? Number(booking.total) : null,
+        status: "pending",
+      });
+    } catch (_) {
+      // Supabase save failed silently
+    }
     const msg = encodeURIComponent(buildWhatsAppMessage(booking));
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
     setSent(true);
@@ -89,6 +112,9 @@ export default function Payment({ onBack }) {
             <SummaryRow icon="⏰" label="Time" value={timeSlot} />
             <SummaryRow icon="⌛" label="Duration" value={`${duration} hours`} />
             <SummaryRow icon="👤" label="Passenger" value={booking.fullName || "—"} />
+            <SummaryRow icon="📍" label="Pickup" value={booking.pickup || "—"} />
+            <SummaryRow icon="🏁" label="To" value={booking.destination || "—"} />
+            <SummaryRow icon="🔄" label="Trip" value={booking.tripType === "wait-return" ? "Wait & Return" : "One-Way"} />
             <SummaryRow icon="♿" label="Wheelchair" value={
               booking.wheelchairType === "standard" ? "Standard Width" :
               booking.wheelchairType === "wide" ? "Wide / Power Chair" : "—"
