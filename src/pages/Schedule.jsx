@@ -1,16 +1,19 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import Stepper from "../components/Stepper";
+import { supabase } from "../supabase";
 
-const getAvailability = (dateStr) => {
-  const d = new Date(dateStr + "T00:00:00").getDay();
-  if (d === 0) return "closed";
-  const day = new Date(dateStr + "T00:00:00").getDate();
-  if (day % 7 === 5) return "limited";
-  if (day % 11 === 0) return "booked";
+// Total bookable slots per day (10 AM – 8 PM = 11 slots)
+const TOTAL_SLOTS = 11;
+
+// Derive availability from real booking count
+function getAvailability(dateStr, bookingCounts) {
+  const count = bookingCounts[dateStr] || 0;
+  if (count >= TOTAL_SLOTS) return "booked";
+  if (count >= 4) return "limited";
   return "available";
-};
+}
 
 // Operating hours: 10:00 AM – 10:00 PM
 const SLOT_GROUPS = [
@@ -86,6 +89,27 @@ export default function Schedule({ onNext, onBack }) {
   const [calMonth, setCalMonth] = useState(today.getMonth());
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [bookingCounts, setBookingCounts] = useState({});
+
+  // Fetch real booking counts from Supabase for the visible month
+  useEffect(() => {
+    const firstDay = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-01`;
+    const lastDay = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${new Date(calYear, calMonth + 1, 0).getDate()}`;
+    supabase
+      .from("bookings")
+      .select("booking_date")
+      .gte("booking_date", firstDay)
+      .lte("booking_date", lastDay)
+      .neq("status", "cancelled")
+      .then(({ data }) => {
+        if (!data) return;
+        const counts = {};
+        data.forEach(({ booking_date }) => {
+          counts[booking_date] = (counts[booking_date] || 0) + 1;
+        });
+        setBookingCounts(counts);
+      });
+  }, [calYear, calMonth]);
 
   // Duration chosen in previous step (default 2 hrs)
   const storedDuration = parseInt(
@@ -186,7 +210,7 @@ export default function Schedule({ onNext, onBack }) {
             {days.map((d, idx) => {
               if (!d) return <div key={`e${idx}`} />;
               const dateStr = toDateStr(calYear, calMonth, d);
-              const avail = getAvailability(dateStr);
+              const avail = getAvailability(dateStr, bookingCounts);
               const isSun = new Date(dateStr + "T00:00:00").getDay() === 0;
               const isPast = dateStr < todayStr;
               const isSelected = dateStr === selectedDate;
