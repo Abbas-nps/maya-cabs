@@ -7,6 +7,7 @@ import Schedule from "./pages/Schedule";
 import Details from "./pages/Details";
 import Review from "./pages/Review";
 import Payment from "./pages/Payment";
+import Admin from "./pages/Admin";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/booking/details" element={<Details />} />
         <Route path="/booking/review" element={<Review />} />
         <Route path="/booking/payment" element={<Payment />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </Router>
   );
