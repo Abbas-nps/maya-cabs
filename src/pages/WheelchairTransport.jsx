@@ -30,7 +30,7 @@ export default function WheelchairTransport() {
           </h1>
           <p className="text-slate-600 text-base leading-relaxed mb-6">
             Maya Cabs is Lahore's dedicated wheelchair accessible transport service. We operate
-            purpose-modified vans with hydraulic boarding ramps, four-point tie-down anchor systems,
+          purpose-modified vans with built in ramp, four-point tie-down anchor systems,
             and trained drivers who assist wheelchair users safely from their front door to any
             destination in the city.
           </p>
@@ -40,13 +40,13 @@ export default function WheelchairTransport() {
             {[
               {
                 title: "Hydraulic Boarding Ramp",
-                body: `Our van is fitted with a power-operated hydraulic ramp at the rear. When deployed, the
+                body: `Electronic winch system which pulls the wheelchairs up the in built wheelchair ramp, removing the need for manual pushing up the ramp, ensuring a safe entry and exit. When deployed, the
 ramp creates a gentle slope from ground level to the van floor. Wheelchair users — whether in
 a manual or powered chair — can be wheeled up the ramp without any lifting, step-climbing, or
-transfer out of the chair. The ramp can support up to 350 kg and has non-slip surface texturing.
+transfer out of the chair. The ramp can support up to 250 kg and has non-slip surface texturing.
 The ramp takes approximately 15 seconds to deploy and retract, and is controlled by the driver.
 Family members can assist guiding the chair up the ramp. The ramp width accommodates wheelchairs
-up to 76 cm wide, covering the vast majority of standard and powered chairs available in Pakistan.`,
+up to 73 cm wide, covering the vast majority of standard and powered chairs available in Pakistan.`,
               },
               {
                 title: "Four-Point Tie-Down System",
