@@ -61,29 +61,29 @@ export default function Payment({ onBack }) {
       ? `${booking.slotTime} → ${booking.slotEnd}`
       : "—";
 
-  const handleWhatsApp = async () => {
-    // Save to Supabase (non-blocking — WhatsApp flow continues regardless)
-    try {
-      await supabase.from("bookings").insert({
-        passenger_name: booking.fullName || null,
-        passenger_phone: booking.phone || null,
-        pickup: booking.pickup || null,
-        destination: booking.destination || null,
-        trip_type: booking.tripType || null,
-        wheelchair_type: booking.wheelchairType || null,
-        booking_date: booking.date || null,
-        slot_time: booking.slotTime || null,
-        slot_end: booking.slotEnd || null,
-        duration: booking.duration ? Number(booking.duration) : null,
-        total_pkr: booking.total ? Number(booking.total) : null,
-        status: "pending",
-      });
-    } catch (_) {
-      // Supabase save failed silently
-    }
+  const handleWhatsApp = () => {
+    // Open WhatsApp immediately (must be synchronous to avoid browser popup block)
     const msg = encodeURIComponent(buildWhatsAppMessage(booking));
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
     setSent(true);
+
+    // Save to Supabase in the background after opening WhatsApp
+    supabase.from("bookings").insert({
+      passenger_name: booking.fullName || null,
+      passenger_phone: booking.phone || null,
+      pickup: booking.pickup || null,
+      destination: booking.destination || null,
+      trip_type: booking.tripType || null,
+      wheelchair_type: booking.wheelchairType || null,
+      booking_date: booking.date || null,
+      slot_time: booking.slotTime || null,
+      slot_end: booking.slotEnd || null,
+      duration: booking.duration ? Number(booking.duration) : null,
+      total_pkr: booking.total ? Number(booking.total) : null,
+      status: "pending",
+    }).then(({ error }) => {
+      if (error) console.error("Supabase save error:", error.message);
+    });
   };
 
   return (
