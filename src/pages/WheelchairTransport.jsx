@@ -59,13 +59,10 @@ Together, the two rear ratchet straps and the two forward hook points create fou
 While seated in the wheelchair, the passenger uses a standard vehicle safety seat belt for personal safety throughout the ride.`,
               },
               {
-                title: "Widened Interior and Lowered Floor",
-                body: `The van's interior has been modified with a widened side door opening and a floor that
-sits lower than a standard van. This reduces the angle and distance of the ramp, making
-boarding smoother for both manual chair pushers and passengers in powered chairs. The interior
-ceiling height is sufficient for passengers who remain upright in high-back wheelchairs or
-head-support frames. The van's interior is clear of obstacles, with sufficient turning radius
-for a powered wheelchair to manoeuvre into the secured position without difficulty.`,
+                title: "Lowered Floor Wheelchair Area",
+                body: `The van features a dedicated wheelchair section with a lowered floor to reduce the ramp angle during boarding. This allows smoother entry for both manually assisted wheelchairs and powered chairs, while also providing improved headroom once inside the vehicle.
+
+The side door opening remains standard; access is provided through the rear ramp. The interior layout is kept clear to allow the wheelchair to be guided directly into its securement position rather than manoeuvred or turned within the vehicle.`,
               },
               {
                 title: "Passenger Comfort",
