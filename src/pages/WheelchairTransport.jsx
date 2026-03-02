@@ -92,23 +92,16 @@ The service can accommodate up to three passengers in total (including the wheel
 
           <h2 className="text-2xl font-bold text-slate-900 mt-10 mb-4">Driver Training and Assistance</h2>
           <p className="text-slate-600 leading-relaxed mb-4">
-            Our drivers are selected for their patience, communication skills, and physical
-            capability to assist wheelchair users. Every driver undergoes training in wheelchair
-            tie-down and occupant restraint procedures, safe ramp operation, disability awareness
-            and appropriate communication, and basic first-aid.
+            Our drivers are selected for their patience, professionalism, and physical capability to assist wheelchair users safely. They are primarily Urdu-speaking and are trained specifically in the safe operation of the rear ramp, electronic winch, and four-point tie-down system. Drivers are responsible for securing the wheelchair correctly and ensuring it is safely positioned for travel.
           </p>
           <p className="text-slate-600 leading-relaxed mb-4">
-            The driver will assist the passenger from the front door of their home to the secured
-            position in the van. If the passenger lives in a house with steps, the driver can
-            assist in manoeuvring the chair down the steps — but for significant staircase
-            situations, please inform us in advance so additional assistance can be arranged.
+            The driver will assist the passenger and accompanying family member from the entrance of the home to the secured position inside the van, including operating the ramp, winch, and ratchet straps. If there are steps at the residence, the driver may assist with careful manoeuvring; however, for significant staircases or complex access situations, we request that this be communicated in advance so appropriate arrangements can be considered.
+          </p>
+          <p className="text-slate-600 leading-relaxed mb-4">
+            Our team is trained with an understanding of disability awareness and respectful communication. In Pakistan, accessible transport services are still developing, and we aim to promote independence while offering assistance when needed. Some wheelchair users prefer minimal assistance, while others may require more active support. We approach each situation with sensitivity, ensuring that assistance is provided from a place of care, safety, and respect — never from a position of assumption or infantilisation.
           </p>
           <p className="text-slate-600 leading-relaxed mb-8">
-            Maya Cabs is not a medical transport service and our drivers are not paramedics.
-            Passengers with acute medical conditions requiring medical monitoring during transit
-            should use an appropriate medical ambulance service. Our service is for stable
-            mobility-impaired passengers attending appointments, visiting family, or travelling
-            for daily life activities.
+            Maya Cabs is not a medical transport service, and our drivers are not paramedics. Passengers requiring medical monitoring or emergency-level care during transit should arrange a licensed ambulance service. Our service is designed for stable mobility-impaired passengers attending appointments, visiting family, or travelling for daily life activities.
           </p>
 
           <Link
