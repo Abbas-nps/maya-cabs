@@ -29,73 +29,45 @@ export default function AirportTransfer() {
             Wheelchair Accessible Airport Transfer in Lahore
           </h1>
           <p className="text-slate-600 text-base leading-relaxed mb-6">
-            Travelling by air as a wheelchair user presents unique challenges at every step —
-            from leaving home to reaching the check-in counter. Maya Cabs provides dedicated
-            wheelchair accessible airport transfers to and from Allama Iqbal International Airport
-            in Lahore, ensuring the ground journey is smooth, safe, and dignified.
+            Travelling by air as a wheelchair user presents unique challenges at every step — from leaving home to reaching the check-in counter. Maya Cabs provides wheelchair-accessible airport transfers to and from Allama Iqbal International Airport, ensuring the ground journey between home and the terminal is safe and predictable.
           </p>
 
           <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">Departures — Getting to the Airport</h2>
           <p className="text-slate-600 leading-relaxed mb-4">
-            For outbound travel, we recommend booking a 3- or 4-hour slot depending on your
-            flight departure time and home location. The driver picks you up at your scheduled
-            time, loads your wheelchair and luggage with the hydraulic ramp, and drives directly
-            to the terminal building at Allama Iqbal International Airport.
+            For outbound travel, we recommend booking sufficient hours based on your flight timing and distance from the airport. The driver arrives at the scheduled time, operates the ramp and securement system, and transports you directly to the airport terminal drop-off area.
           </p>
           <p className="text-slate-600 leading-relaxed mb-4">
-            The driver navigates directly to the departure hall drop-off zone. He assists you
-            off the ramp and accompanies you to the check-in area entrance if needed. Most
-            international and domestic terminals have airport wheelchair assistance services
-            from check-in onwards — Maya Cabs covers the door-to-terminal portion that standard
-            airline services do not provide.
+            Driver assistance is limited to helping the wheelchair user safely enter and exit the van. Assistance beyond the vehicle — including movement through the airport building, check-in counters, or security areas — must be arranged directly with the airline or airport assistance services. We strongly recommend requesting airport wheelchair assistance from your airline in advance.
           </p>
           <p className="text-slate-600 leading-relaxed mb-6">
-            We recommend requesting airport wheelchair assistance directly from your airline at
-            least 48 hours before travel. Maya Cabs handles the home-to-airport portion. The
-            airline's ground handling team takes over from the airport entrance.
+            At the time of booking, we can provide the vehicle registration details so that airport assistance staff or family members can coordinate pickup and drop-off.
           </p>
 
-          <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">Arrivals — Picking Up from the Airport</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">Arrivals — Pickup from the Airport</h2>
           <p className="text-slate-600 leading-relaxed mb-4">
-            For airport pickup after a flight, provide us with your flight number and expected
-            arrival time when booking. We monitor flight arrival status and adjust pickup timing
-            accordingly. The driver will be waiting in the arrivals area with sufficient time for
-            you to clear immigration, collect luggage, and exit the terminal.
+            For airport pickups, the booking must include the flight number and approximate arrival time. Maya Cabs does not monitor flight status, immigration processing, or baggage claim times.
           </p>
           <p className="text-slate-600 leading-relaxed mb-4">
-            For international arrivals, please allow 45–90 minutes from landing to exit,
-            depending on immigration queues. The driver will wait for up to 2 hours within the
-            booking window. If your flight is significantly delayed, please contact us via
-            WhatsApp so we can reschedule without penalty.
+            Waiting time is included within the booked time slot. The van will wait during the scheduled booking window only. If the arrival process takes longer than the booked hours, a new booking will be required and the vehicle may need to depart to honour other scheduled rides. We therefore advise booking ample hours to account for immigration, baggage collection, and airport procedures.
+          </p>
+          <p className="text-slate-600 leading-relaxed mb-6">
+            For international travellers, please follow airport security procedures and coordinate with airport assistance services before exiting the terminal.
           </p>
 
           <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">Luggage and Equipment</h2>
           <p className="text-slate-600 leading-relaxed mb-4">
-            The van's boot area accommodates standard travel luggage — up to 3 large suitcases —
-            alongside the wheelchair. If travelling with a powered wheelchair, the battery may
-            need to be detached for the vehicle journey depending on size. For travel with a
-            powered chair, please contact us in advance at +92 339 6292222 so we can confirm
-            compatibility and prepare accordingly.
+            The vehicle is configured primarily for a wheelchair user seated in their wheelchair. When the wheelchair position is occupied, remaining space for luggage is limited. Passengers should plan luggage arrangements accordingly and may consider a separate vehicle for additional baggage if required.
           </p>
           <p className="text-slate-600 leading-relaxed mb-4">
-            If travelling with medical equipment such as a portable oxygen concentrator or a
-            CPAP machine, inform us when booking so the driver is prepared. Maya Cabs does not
-            operate medical support equipment — the passenger or their carer is responsible for
-            all medical devices during the journey.
+            If travelling with equipment such as portable oxygen concentrators or CPAP devices, these remain the responsibility of the passenger or accompanying person. Maya Cabs does not operate or supervise medical equipment during transit.
           </p>
 
           <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">Booking Your Airport Transfer</h2>
           <p className="text-slate-600 leading-relaxed mb-4">
-            All airport transfers are booked online. Select a 3-hour (domestic) or 4-hour
-            (international) slot. Enter your home address as pickup and "Allama Iqbal Airport
-            Lahore" as the destination. For arrivals, enter the airport as pickup and your home
-            as destination. Include your flight number in the notes field via WhatsApp during
-            confirmation.
+            Airport transfers are booked online. Select the appropriate number of hours based on your travel needs. Enter your home address and "Allama Iqbal Airport Lahore" as the destination (or vice versa for arrivals), and provide your flight details during confirmation via WhatsApp.
           </p>
           <p className="text-slate-600 leading-relaxed mb-8">
-            We strongly recommend booking airport transfers at least 24 hours in advance to
-            guarantee slot availability, especially for early morning or late evening flights.
-            Same-day airport bookings are subject to 4-hour advance notice and slot availability.
+            We recommend booking at least 24 hours in advance, especially for early morning or late-night flights. Same-day bookings depend on availability and sufficient advance notice.
           </p>
 
           <Link
