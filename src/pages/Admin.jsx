@@ -3,6 +3,42 @@ import { supabase } from "../supabase";
 
 // ── Simple PIN gate — change this to your preference ──────────────────────────
 const ADMIN_PIN = "1122";
+const HOLD_MINUTES = 15;
+
+// ── Hold helpers ─────────────────────────────────────────────────────────────
+function holdSecondsLeft(createdAt) {
+  if (!createdAt) return 0;
+  const expiresAt = new Date(createdAt).getTime() + HOLD_MINUTES * 60 * 1000;
+  return Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
+}
+function isActiveHold(booking) {
+  return booking.status === "pending" && holdSecondsLeft(booking.created_at) > 0;
+}
+function isExpiredHold(booking) {
+  return booking.status === "pending" && holdSecondsLeft(booking.created_at) === 0;
+}
+
+// ── Live countdown badge ──────────────────────────────────────────────────────
+function HoldCountdown({ createdAt }) {
+  const [secs, setSecs] = useState(() => holdSecondsLeft(createdAt));
+  useEffect(() => {
+    if (secs <= 0) return;
+    const t = setInterval(() => setSecs(holdSecondsLeft(createdAt)), 1000);
+    return () => clearInterval(t);
+  }, [createdAt, secs]);
+  if (secs <= 0) return (
+    <span className="text-xs font-bold px-2 py-0.5 rounded-full border bg-slate-100 text-slate-400 border-slate-200">
+      Hold expired
+    </span>
+  );
+  const m = Math.floor(secs / 60);
+  const s = String(secs % 60).padStart(2, "0");
+  return (
+    <span className="text-xs font-bold px-2 py-0.5 rounded-full border bg-orange-100 text-orange-700 border-orange-200 flex items-center gap-1">
+      🔒 On Hold {m}:{s}
+    </span>
+  );
+}
 
 const STATUS_COLORS = {
   pending:   "bg-amber-100 text-amber-700 border-amber-200",
@@ -107,16 +143,21 @@ function BookingModal({ booking, onClose, onStatusChange }) {
     >
       <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-xl max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="bg-teal-700 px-5 py-4 flex items-center justify-between flex-shrink-0">
+        <div className={`px-5 py-4 flex items-center justify-between flex-shrink-0 ${isActiveHold(booking) ? "bg-orange-600" : "bg-teal-700"}`}>
           <div>
             <div className="font-bold text-white text-base">{booking.passenger_name || "—"}</div>
-            <div className="text-teal-200 text-xs">{booking.passenger_phone || "—"}</div>
+            <div className="text-white/70 text-xs">{booking.passenger_phone || "—"}</div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
-            <svg width={16} height={16} viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth={2}>
-              <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            {booking.status === "pending" && (
+              <HoldCountdown createdAt={booking.created_at} />
+            )}
+            <button onClick={onClose} className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+              <svg width={16} height={16} viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth={2}>
+                <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Scroll body */}
@@ -238,9 +279,13 @@ function BookingCard({ booking, onClick }) {
           <span className="font-bold text-slate-900 text-sm truncate">
             {booking.passenger_name || "Unknown"}
           </span>
-          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border capitalize ${STATUS_COLORS[status]}`}>
-            {status}
-          </span>
+          {booking.status === "pending" ? (
+            <HoldCountdown createdAt={booking.created_at} />
+          ) : (
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border capitalize ${STATUS_COLORS[status]}`}>
+              {status}
+            </span>
+          )}
         </div>
         <div className="text-slate-500 text-xs mt-0.5 truncate">
           {booking.pickup ? `${booking.pickup} → ${booking.destination || "?"}` : "No journey info"}

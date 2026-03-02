@@ -95,12 +95,15 @@ export default function Schedule({ onNext, onBack }) {
   useEffect(() => {
     const firstDay = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-01`;
     const lastDay = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${new Date(calYear, calMonth + 1, 0).getDate()}`;
+    // Only count confirmed/completed + pending holds still within 15-min window
+    const holdCutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
     supabase
       .from("bookings")
       .select("booking_date")
       .gte("booking_date", firstDay)
       .lte("booking_date", lastDay)
       .neq("status", "cancelled")
+      .or(`status.neq.pending,created_at.gte.${holdCutoff}`)
       .then(({ data }) => {
         if (!data) return;
         const counts = {};
