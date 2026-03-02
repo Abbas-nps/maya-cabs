@@ -115,30 +115,48 @@ export default function Schedule({ onNext, onBack }) {
       });
   }, [calYear, calMonth]);
 
-  // Fetch slot-level status for the selected date
+  // Duration chosen in previous step (default 2 hrs) — must be before slot useEffect
+  const storedDuration = parseInt(
+    JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}").duration || "2",
+    10
+  );
+
+  // Fetch slot-level status for the selected date (range-aware + 1hr buffer)
   useEffect(() => {
     if (!selectedDate) return;
     const holdCutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
     supabase
       .from("bookings")
-      .select("slot_time, status, created_at")
+      .select("slot_time, duration, status, created_at")
       .eq("booking_date", selectedDate)
       .neq("status", "cancelled")
       .or(`status.neq.pending,created_at.gte.${holdCutoff}`)
       .then(({ data }) => {
         if (!data) return;
+        // For every possible slot on the page, check if any existing booking's
+        // occupied window (start → start + duration + 1hr buffer) overlaps with
+        // the new slot's window (slotStart → slotStart + customerDuration).
+        const ALL_SLOTS = SLOT_GROUPS.flatMap((g) => g.slots);
         const slots = {};
-        data.forEach(({ slot_time, status }) => {
-          // If multiple bookings on same slot, worst status wins
-          slots[slot_time] = status;
+        ALL_SLOTS.forEach((slotTime) => {
+          const newStart = slotToHour(slotTime);
+          const newEnd   = newStart + storedDuration;
+          data.forEach(({ slot_time, duration: existingDur, status }) => {
+            const existStart  = slotToHour(slot_time);
+            const existEnd    = existStart + (existingDur || 2) + 1; // +1hr buffer
+            const overlaps    = newStart < existEnd && newEnd > existStart;
+            if (overlaps) {
+              // Confirmed/completed beats pending in priority
+              const current = slots[slotTime];
+              if (!current || current === "pending") {
+                slots[slotTime] = status;
+              }
+            }
+          });
         });
         setTakenSlots(slots);
       });
-  }, [selectedDate]);
-  const storedDuration = parseInt(
-    JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}").duration || "2",
-    10
-  );
+  }, [selectedDate, storedDuration]);
 
   // 4-hour advance booking rule
   const now = new Date();
