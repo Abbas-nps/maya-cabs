@@ -79,14 +79,16 @@ The service can accommodate up to three passengers in total (including the wheel
           </div>
 
           <h2 className="text-2xl font-bold text-slate-900 mt-10 mb-4">Types of Wheelchairs We Transport</h2>
-          <ul className="list-disc list-inside space-y-2 text-slate-600 mb-8">
+          <ul className="list-disc list-inside space-y-2 text-slate-600 mb-3">
             <li>Standard manual wheelchairs (folding and rigid frame)</li>
             <li>Lightweight transit/attendant-propelled wheelchairs</li>
-            <li>Wide manual wheelchairs (bariatric up to 76cm width)</li>
             <li>Powered/electric wheelchairs (all standard sizes)</li>
             <li>Tilt-in-space and reclining wheelchairs</li>
             <li>Paediatric wheelchairs (children must be accompanied by a caregiver)</li>
           </ul>
+          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-8">
+            ⚠️ We are unable to accommodate wheelchairs wider than 28 inches (71cm). Please check your wheelchair width before booking.
+          </p>
 
           <h2 className="text-2xl font-bold text-slate-900 mt-10 mb-4">Driver Training and Assistance</h2>
           <p className="text-slate-600 leading-relaxed mb-4">
