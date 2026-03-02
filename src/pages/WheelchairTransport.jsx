@@ -66,12 +66,9 @@ The side door opening remains standard; access is provided through the rear ramp
               },
               {
                 title: "Passenger Comfort",
-                body: `During the journey, the wheelchair-secured passenger faces forward, in the standard
-travelling direction. This is important for passenger comfort, reducing motion sickness and
-anxiety. The driver's cab is separated by a clear window, allowing easy communication without
-the driver turning around. Air conditioning vents are accessible from the passenger area.
-A carer or family member may travel alongside the passenger in the adjacent seat. We encourage
-at least one accompanying person for passengers with complex medical needs.`,
+                body: `During the journey, the wheelchair user travels facing forward in the normal direction of travel. The driver's area is open to the passenger compartment, allowing easy communication when needed. Air conditioning from the vehicle serves the passenger area, and seating is available for accompanying family members or attendants.
+
+The service can accommodate up to three passengers in total (including the wheelchair user) in addition to the MayaCabs driver, with one seat available in the front and one in the rear alongside the wheelchair position.`,
               },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
