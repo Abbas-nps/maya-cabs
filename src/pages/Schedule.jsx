@@ -355,7 +355,7 @@ export default function Schedule({ onNext, onBack }) {
               <span className="text-slate-500 text-xs">On Hold (15 min)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm bg-slate-100 border-2 border-slate-200 inline-block" />
+              <span className="w-3 h-3 rounded-sm bg-orange-50 border-2 border-orange-300 inline-block" />
               <span className="text-slate-500 text-xs">Booked</span>
             </div>
           </div>
@@ -400,13 +400,14 @@ export default function Schedule({ onNext, onBack }) {
                     <button
                       key={slotTime}
                       disabled={isDisabled}
+                      title={isBooked ? "BOOKED" : undefined}
                       onClick={() => !isPending && setSelectedSlot({ time: slotTime, endTime })}
                       className={[
-                        "rounded-xl border-2 px-4 py-3 font-bold text-sm transition text-center relative min-w-[100px]",
+                        "rounded-xl border-2 px-4 py-3 font-bold text-sm transition text-center relative min-w-[100px] group",
                         isActive
                           ? "bg-teal-700 border-teal-700 text-white"
                           : isBooked
-                          ? "bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed"
+                          ? "bg-orange-50 border-orange-300 text-orange-400 cursor-not-allowed"
                           : isPending
                           ? "bg-amber-50 border-amber-300 text-amber-700 cursor-not-allowed"
                           : locked
@@ -430,7 +431,7 @@ export default function Schedule({ onNext, onBack }) {
                         <div className="text-amber-600 text-xs font-semibold mt-0.5">⏳ On Hold</div>
                       )}
                       {isBooked && (
-                        <div className="text-slate-400 text-xs font-normal mt-0.5">Booked</div>
+                        <div className="text-orange-400 text-xs font-bold mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">BOOKED</div>
                       )}
                       {locked === "too-late" && !isBooked && !isPending && (
                         <div className="text-slate-300 text-xs font-normal mt-0.5">ends after 10 PM</div>
