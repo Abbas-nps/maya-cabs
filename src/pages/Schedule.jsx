@@ -90,6 +90,7 @@ export default function Schedule({ onNext, onBack }) {
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [bookingCounts, setBookingCounts] = useState({});
+  const [takenSlots, setTakenSlots] = useState({}); // { "10:00 AM": "pending" | "confirmed" | ... }
 
   // Fetch real booking counts from Supabase for the visible month
   useEffect(() => {
@@ -114,7 +115,26 @@ export default function Schedule({ onNext, onBack }) {
       });
   }, [calYear, calMonth]);
 
-  // Duration chosen in previous step (default 2 hrs)
+  // Fetch slot-level status for the selected date
+  useEffect(() => {
+    if (!selectedDate) return;
+    const holdCutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    supabase
+      .from("bookings")
+      .select("slot_time, status, created_at")
+      .eq("booking_date", selectedDate)
+      .neq("status", "cancelled")
+      .or(`status.neq.pending,created_at.gte.${holdCutoff}`)
+      .then(({ data }) => {
+        if (!data) return;
+        const slots = {};
+        data.forEach(({ slot_time, status }) => {
+          // If multiple bookings on same slot, worst status wins
+          slots[slot_time] = status;
+        });
+        setTakenSlots(slots);
+      });
+  }, [selectedDate]);
   const storedDuration = parseInt(
     JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}").duration || "2",
     10
@@ -307,6 +327,20 @@ export default function Schedule({ onNext, onBack }) {
             <span className="font-bold text-slate-900 text-base">Select Start Time</span>
           </div>
           <p className="text-slate-400 text-xs mb-3">Slots run 10:00 AM – 10:00 PM (PKT)</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 mb-4">
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-sm bg-white border-2 border-slate-200 inline-block" />
+              <span className="text-slate-500 text-xs">Available</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-sm bg-amber-50 border-2 border-amber-300 inline-block" />
+              <span className="text-slate-500 text-xs">On Hold (15 min)</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-sm bg-slate-100 border-2 border-slate-200 inline-block" />
+              <span className="text-slate-500 text-xs">Booked</span>
+            </div>
+          </div>
 
           {/* 4-hour advance notice — shown only when today is selected */}
           {selectedDate === todayStr && (
@@ -339,24 +373,32 @@ export default function Schedule({ onNext, onBack }) {
                 {group.slots.map((slotTime) => {
                   const endTime = addHours(slotTime, storedDuration);
                   const locked = isSlotLocked(slotTime);
+                  const takenStatus = takenSlots[slotTime]; // "pending" | "confirmed" | "completed" | undefined
+                  const isPending = takenStatus === "pending";
+                  const isBooked = takenStatus === "confirmed" || takenStatus === "completed";
+                  const isDisabled = !!locked || isBooked;
                   const isActive = selectedSlot?.time === slotTime;
                   return (
                     <button
                       key={slotTime}
-                      disabled={!!locked}
-                      onClick={() => setSelectedSlot({ time: slotTime, endTime })}
+                      disabled={isDisabled}
+                      onClick={() => !isPending && setSelectedSlot({ time: slotTime, endTime })}
                       className={[
-                        "rounded-xl border-2 px-4 py-3 font-bold text-sm transition text-center relative",
+                        "rounded-xl border-2 px-4 py-3 font-bold text-sm transition text-center relative min-w-[100px]",
                         isActive
                           ? "bg-teal-700 border-teal-700 text-white"
+                          : isBooked
+                          ? "bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed"
+                          : isPending
+                          ? "bg-amber-50 border-amber-300 text-amber-700 cursor-not-allowed"
                           : locked
                           ? "bg-slate-50 border-slate-200 text-slate-300 cursor-not-allowed"
                           : "bg-white border-slate-200 text-slate-800 hover:border-teal-300",
                       ].join(" ")}
                     >
                       <span className="flex items-center gap-1 justify-center">
-                        {locked && (
-                          <svg viewBox="0 0 16 16" width={12} height={12} fill="none" stroke="#cbd5e1" strokeWidth={1.8}>
+                        {(locked || isBooked) && !isPending && (
+                          <svg viewBox="0 0 16 16" width={12} height={12} fill="none" stroke="currentColor" strokeWidth={1.8}>
                             <rect x="3" y="7" width="10" height="7" rx="1.5" />
                             <path d="M5 7V5a3 3 0 0 1 6 0v2" strokeLinecap="round" />
                           </svg>
@@ -364,11 +406,15 @@ export default function Schedule({ onNext, onBack }) {
                         {slotTime}
                       </span>
                       {isActive && (
-                        <div className="text-teal-200 text-xs font-normal mt-0.5">
-                          until {endTime}
-                        </div>
+                        <div className="text-teal-200 text-xs font-normal mt-0.5">until {endTime}</div>
                       )}
-                      {locked === "too-late" && (
+                      {isPending && (
+                        <div className="text-amber-600 text-xs font-semibold mt-0.5">⏳ On Hold</div>
+                      )}
+                      {isBooked && (
+                        <div className="text-slate-400 text-xs font-normal mt-0.5">Booked</div>
+                      )}
+                      {locked === "too-late" && !isBooked && !isPending && (
                         <div className="text-slate-300 text-xs font-normal mt-0.5">ends after 10 PM</div>
                       )}
                     </button>
