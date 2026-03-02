@@ -49,15 +49,14 @@ Family members can assist guiding the chair up the ramp. The ramp width accommod
 up to 73 cm wide, covering the vast majority of standard and powered chairs available in Pakistan.`,
               },
               {
-                title: "Four-Point Tie-Down System",
-                body: `Once inside the van, the wheelchair is secured using a four-point tie-down system.
-Four heavy-duty straps attach to the wheelchair frame at the front and rear on both sides.
-Each strap is tensioned and locked using a ratchet mechanism that prevents any movement of
-the chair during the journey. The tie-down system meets international W19 (ISO 10542)
-wheelchair transport standards. In addition to the chair tie-down, an occupant restraint
-system — a lap belt and shoulder harness — is offered to the passenger. These straps are
-adjusted to the passenger's body size and provide the same protection as standard vehicle
-seat belts.`,
+                title: "Four-Point Wheelchair Securement System",
+                body: `Once inside the van, the wheelchair is secured using a four-point tie-down system designed to prevent movement during the journey.
+
+Two heavy-duty ratchet straps anchor the wheelchair in place from the rear, locking the chair firmly to the vehicle floor. At the front, two secure hooks connect to the wheelchair and are also used during boarding: the electronic winch pulls the wheelchair up the ramp and into the vehicle. After entry, the winch connection remains attached, providing an additional forward restraint and added safety.
+
+Together, the two rear ratchet straps and the two forward hook points create four independent securement positions, stabilizing the wheelchair from both forward and backward motion while the vehicle is in transit.
+
+While seated in the wheelchair, the passenger uses a standard vehicle safety seat belt for personal safety throughout the ride.`,
               },
               {
                 title: "Widened Interior and Lowered Floor",
