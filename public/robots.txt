@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Block admin and booking flow from indexing
+Disallow: /admin
+Disallow: /booking/
+
+Sitemap: https://mayacabs.pk/sitemap.xml
