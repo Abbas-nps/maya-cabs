@@ -11,8 +11,7 @@ const Schedule = lazy(() => import("./pages/Schedule"));
 const Details = lazy(() => import("./pages/Details"));
 const Review = lazy(() => import("./pages/Review"));
 const Payment = lazy(() => import("./pages/Payment"));
-const Admin = lazy(() => import("./pages/Admin"));
-
+const Admin = lazy(() => import("./pages/Admin"));const OperationsLog = lazy(() => import('./pages/admin/log'));
 // Lazy loaded — SEO content pages
 const Services = lazy(() => import("./pages/Services"));
 const HowItWorks = lazy(() => import("./pages/HowItWorks"));
@@ -50,6 +49,7 @@ export default function AppRoutes() {
 
         {/* Admin */}
         <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/log" element={<OperationsLog />} />
 
         {/* SEO content pages */}
         <Route path="/services" element={<Services />} />
