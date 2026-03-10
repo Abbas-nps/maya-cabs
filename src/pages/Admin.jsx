@@ -313,19 +313,33 @@ function BookingCard({ booking, onClick }) {
 }
 
 // ── Block Dates Panel ───────────────────────────────────────────────────────
+// Generate all YYYY-MM-DD strings between two dates (inclusive)
+function dateRange(from, to) {
+  const dates = [];
+  const cur = new Date(from + "T00:00:00");
+  const end = new Date(to   + "T00:00:00");
+  while (cur <= end) {
+    dates.push(cur.toISOString().slice(0, 10));
+    cur.setDate(cur.getDate() + 1);
+  }
+  return dates;
+}
+
 function BlockedDatesPanel({ blockedDates, onRefresh }) {
   const today = new Date().toISOString().slice(0, 10);
-  const [date, setDate] = useState(today);
+  const [from, setFrom] = useState(today);
+  const [to,   setTo]   = useState(today);
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(null);
 
   async function handleBlock() {
-    if (!date) return;
+    if (!from || !to || to < from) return;
     setSaving(true);
+    const rows = dateRange(from, to).map(d => ({ date: d, reason: reason || null }));
     await supabase
       .from("blocked_dates")
-      .upsert({ date, reason: reason || null }, { onConflict: "date" });
+      .upsert(rows, { onConflict: "date" });
     setSaving(false);
     setReason("");
     onRefresh();
@@ -347,30 +361,43 @@ function BlockedDatesPanel({ blockedDates, onRefresh }) {
           <path d="M9 16l6-6M15 16l-6-6" strokeLinecap="round" />
         </svg>
         <span className="font-bold text-slate-800 text-sm">Block Dates</span>
-        <span className="text-xs text-slate-400">(reason is private — customers only see the date as unavailable)</span>
+        <span className="text-xs text-slate-400">(reason is private — customers only see dates as unavailable)</span>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 mb-4">
-        <input
-          type="date"
-          value={date}
-          min={today}
-          onChange={e => setDate(e.target.value)}
-          className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:border-red-400"
-        />
+      <div className="flex flex-col sm:flex-row gap-2 mb-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          <label className="text-xs text-slate-500 whitespace-nowrap">From</label>
+          <input
+            type="date"
+            value={from}
+            min={today}
+            onChange={e => { setFrom(e.target.value); if (e.target.value > to) setTo(e.target.value); }}
+            className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:border-red-400"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-xs text-slate-500 whitespace-nowrap">To</label>
+          <input
+            type="date"
+            value={to}
+            min={from || today}
+            onChange={e => setTo(e.target.value)}
+            className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:border-red-400"
+          />
+        </div>
         <input
           type="text"
           placeholder="Reason (private — e.g. car service, personal)"
           value={reason}
           onChange={e => setReason(e.target.value)}
-          className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:border-red-400"
+          className="flex-1 min-w-0 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:border-red-400"
         />
         <button
           onClick={handleBlock}
-          disabled={saving || !date}
+          disabled={saving || !from || !to || to < from}
           className="bg-red-600 text-white text-sm font-bold rounded-xl px-4 py-2 hover:bg-red-700 transition disabled:opacity-50 whitespace-nowrap"
         >
-          {saving ? "Blocking…" : "Block Date"}
+          {saving ? "Blocking…" : "Block"}
         </button>
       </div>
 
