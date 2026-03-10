@@ -332,24 +332,31 @@ function BlockedDatesPanel({ blockedDates, onRefresh }) {
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
   const [removing, setRemoving] = useState(null);
+  const [blockError, setBlockError] = useState(null);
 
   async function handleBlock() {
     if (!from || !to || to < from) return;
     setSaving(true);
+    setBlockError(null);
     const rows = dateRange(from, to).map(d => ({ date: d, reason: reason || null }));
-    await supabase
+    const { error } = await supabase
       .from("blocked_dates")
       .upsert(rows, { onConflict: "date" });
     setSaving(false);
-    setReason("");
-    onRefresh();
+    if (error) {
+      setBlockError(error.message);
+    } else {
+      setReason("");
+      onRefresh();
+    }
   }
 
   async function handleUnblock(id) {
     setRemoving(id);
-    await supabase.from("blocked_dates").delete().eq("id", id);
+    const { error } = await supabase.from("blocked_dates").delete().eq("id", id);
     setRemoving(null);
-    onRefresh();
+    if (error) alert("Unblock failed: " + error.message);
+    else onRefresh();
   }
 
   return (
@@ -400,6 +407,17 @@ function BlockedDatesPanel({ blockedDates, onRefresh }) {
           {saving ? "Blocking…" : "Block"}
         </button>
       </div>
+
+      {blockError && (
+        <div className="text-red-600 text-xs mb-3 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+          ⚠️ {blockError}
+          {blockError.includes("does not exist") && (
+            <div className="mt-1 text-slate-500">
+              Create the <code className="bg-slate-100 px-1 rounded">blocked_dates</code> table in Supabase first — see setup instructions.
+            </div>
+          )}
+        </div>
+      )}
 
       {blockedDates.length === 0 ? (
         <div className="text-slate-400 text-xs">No dates currently blocked.</div>
