@@ -8,7 +8,8 @@ import { supabase } from "../supabase";
 const TOTAL_SLOTS = 11;
 
 // Derive availability from real booking count
-function getAvailability(dateStr, bookingCounts) {
+function getAvailability(dateStr, bookingCounts, blockedDateSet) {
+  if (blockedDateSet && blockedDateSet.has(dateStr)) return "booked";
   const count = bookingCounts[dateStr] || 0;
   if (count >= TOTAL_SLOTS) return "booked";
   if (count >= 4) return "limited";
@@ -91,6 +92,7 @@ export default function Schedule({ onNext, onBack }) {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [bookingCounts, setBookingCounts] = useState({});
   const [takenSlots, setTakenSlots] = useState({}); // { "10:00 AM": "pending" | "confirmed" | ... }
+  const [blockedDateSet, setBlockedDateSet] = useState(new Set());
 
   // Fetch real booking counts from Supabase for the visible month
   useEffect(() => {
@@ -114,6 +116,16 @@ export default function Schedule({ onNext, onBack }) {
         setBookingCounts(counts);
       });
   }, [calYear, calMonth]);
+
+  // Fetch blocked dates once on mount
+  useEffect(() => {
+    supabase
+      .from("blocked_dates")
+      .select("date")
+      .then(({ data }) => {
+        setBlockedDateSet(new Set((data || []).map(r => r.date)));
+      });
+  }, []);
 
   // Duration chosen in previous step (default 2 hrs) — must be before slot useEffect
   const storedDuration = parseInt(
@@ -251,7 +263,7 @@ export default function Schedule({ onNext, onBack }) {
             {days.map((d, idx) => {
               if (!d) return <div key={`e${idx}`} />;
               const dateStr = toDateStr(calYear, calMonth, d);
-              const avail = getAvailability(dateStr, bookingCounts);
+              const avail = getAvailability(dateStr, bookingCounts, blockedDateSet);
               const isSun = new Date(dateStr + "T00:00:00").getDay() === 0;
               const isPast = dateStr < todayStr;
               const isSelected = dateStr === selectedDate;

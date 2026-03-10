@@ -312,6 +312,95 @@ function BookingCard({ booking, onClick }) {
   );
 }
 
+// ── Block Dates Panel ───────────────────────────────────────────────────────
+function BlockedDatesPanel({ blockedDates, onRefresh }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const [date, setDate] = useState(today);
+  const [reason, setReason] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState(null);
+
+  async function handleBlock() {
+    if (!date) return;
+    setSaving(true);
+    await supabase
+      .from("blocked_dates")
+      .upsert({ date, reason: reason || null }, { onConflict: "date" });
+    setSaving(false);
+    setReason("");
+    onRefresh();
+  }
+
+  async function handleUnblock(id) {
+    setRemoving(id);
+    await supabase.from("blocked_dates").delete().eq("id", id);
+    setRemoving(null);
+    onRefresh();
+  }
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm p-4 mt-4">
+      <div className="flex items-center gap-2 mb-3">
+        <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth={2}>
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" strokeLinecap="round" />
+          <path d="M9 16l6-6M15 16l-6-6" strokeLinecap="round" />
+        </svg>
+        <span className="font-bold text-slate-800 text-sm">Block Dates</span>
+        <span className="text-xs text-slate-400">(reason is private — customers only see the date as unavailable)</span>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-2 mb-4">
+        <input
+          type="date"
+          value={date}
+          min={today}
+          onChange={e => setDate(e.target.value)}
+          className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:border-red-400"
+        />
+        <input
+          type="text"
+          placeholder="Reason (private — e.g. car service, personal)"
+          value={reason}
+          onChange={e => setReason(e.target.value)}
+          className="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:border-red-400"
+        />
+        <button
+          onClick={handleBlock}
+          disabled={saving || !date}
+          className="bg-red-600 text-white text-sm font-bold rounded-xl px-4 py-2 hover:bg-red-700 transition disabled:opacity-50 whitespace-nowrap"
+        >
+          {saving ? "Blocking…" : "Block Date"}
+        </button>
+      </div>
+
+      {blockedDates.length === 0 ? (
+        <div className="text-slate-400 text-xs">No dates currently blocked.</div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {blockedDates.map(bd => (
+            <div key={bd.id} className="flex items-center justify-between bg-red-50 border border-red-100 rounded-xl px-3 py-2">
+              <div className="flex flex-col">
+                <span className="font-bold text-red-700 text-sm">{fmtDate(bd.date)}</span>
+                {bd.reason && (
+                  <span className="text-slate-500 text-xs mt-0.5">{bd.reason}</span>
+                )}
+              </div>
+              <button
+                onClick={() => handleUnblock(bd.id)}
+                disabled={removing === bd.id}
+                className="text-xs text-slate-400 hover:text-red-600 transition font-semibold ml-4 flex-shrink-0"
+              >
+                {removing === bd.id ? "…" : "Unblock"}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main Admin Dashboard ──────────────────────────────────────────────────────
 export default function Admin() {
   const [unlocked, setUnlocked] = useState(
@@ -323,6 +412,7 @@ export default function Admin() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
+  const [blockedDates, setBlockedDates] = useState([]);
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
@@ -336,9 +426,17 @@ export default function Admin() {
     else setBookings(data || []);
   }, []);
 
+  const fetchBlockedDates = useCallback(async () => {
+    const { data } = await supabase
+      .from("blocked_dates")
+      .select("*")
+      .order("date", { ascending: true });
+    setBlockedDates(data || []);
+  }, []);
+
   useEffect(() => {
-    if (unlocked) fetchBookings();
-  }, [unlocked, fetchBookings]);
+    if (unlocked) { fetchBookings(); fetchBlockedDates(); }
+  }, [unlocked, fetchBookings, fetchBlockedDates]);
 
   const handleUnlock = () => {
     sessionStorage.setItem("adminUnlocked", "true");
@@ -483,6 +581,8 @@ export default function Admin() {
             ))}
           </div>
         )}
+
+        <BlockedDatesPanel blockedDates={blockedDates} onRefresh={fetchBlockedDates} />
       </main>
 
       {/* Detail modal */}
