@@ -379,6 +379,7 @@ function BlockedDatesPanel({ blockedDates, onRefresh }) {
             value={from}
             min={today}
             onChange={e => { setFrom(e.target.value); if (e.target.value > to) setTo(e.target.value); }}
+            onFocus={e => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' })}
             className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:border-red-400"
           />
         </div>
@@ -389,6 +390,7 @@ function BlockedDatesPanel({ blockedDates, onRefresh }) {
             value={to}
             min={from || today}
             onChange={e => setTo(e.target.value)}
+            onFocus={e => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' })}
             className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:border-red-400"
           />
         </div>
@@ -577,7 +579,7 @@ export default function Admin() {
         </div>
       </div>
 
-      <main className="flex-1 px-4 pt-4 pb-8">
+      <main className="flex-1 px-4 pt-4 pb-64 overflow-y-auto">
         {/* Search */}
         <div className="bg-white rounded-2xl shadow-sm px-4 py-3 flex items-center gap-3 mb-4">
           <svg width={16} height={16} viewBox="0 0 16 16" fill="none" stroke="#94a3b8" strokeWidth={2}>
