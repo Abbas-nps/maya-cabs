@@ -30,6 +30,14 @@ const OPTIONS = [
     desc: "For longer trips or multiple appointments in a day.",
     banner: null,
   },
+  {
+    hours: 10,
+    label: "10 Hours",
+    tag: "Full Day",
+    tagColor: "bg-indigo-100 text-indigo-700",
+    desc: "All-day dedicated van & driver — ideal for outstation trips, events, or full-day hospital stays.",
+    banner: "BEST VALUE",
+  },
 ];
 
 export default function Duration({ onNext, onBack }) {
