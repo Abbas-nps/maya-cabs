@@ -4,8 +4,8 @@ import TopBar from "../components/TopBar";
 import Stepper from "../components/Stepper";
 import { supabase } from "../supabase";
 
-// Total bookable slots per day (10 AM – 8 PM = 11 slots)
-const TOTAL_SLOTS = 11;
+// Total bookable slots per day (9 AM – 8 PM = 12 slots)
+const TOTAL_SLOTS = 12;
 
 // Derive availability from real booking count
 function getAvailability(dateStr, bookingCounts, blockedDateSet) {
@@ -16,12 +16,12 @@ function getAvailability(dateStr, bookingCounts, blockedDateSet) {
   return "available";
 }
 
-// Operating hours: 10:00 AM – 10:00 PM
+// Operating hours: 9:00 AM – 8:00 PM
 const SLOT_GROUPS = [
   {
     period: "MORNING",
     emoji: "☀️",
-    slots: ["10:00 AM", "11:00 AM"],
+    slots: ["9:00 AM", "10:00 AM", "11:00 AM"],
   },
   {
     period: "AFTERNOON",
