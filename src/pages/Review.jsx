@@ -28,7 +28,10 @@ export default function Review({ onNext, onBack }) {
   const booking = JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}");
 
   const duration = booking.duration || "—";
-  const total = booking.total || (booking.duration ? booking.duration * 2500 : "—");
+  const durationHours = Number(booking.duration);
+  const total = Number.isFinite(durationHours) && durationHours > 0
+    ? durationHours * 4500
+    : (booking.total || "—");
   const date = formatDate(booking.date);
   const timeSlot = booking.slotTime && booking.slotEnd
     ? `${booking.slotTime} → ${booking.slotEnd}`
@@ -111,7 +114,7 @@ export default function Review({ onNext, onBack }) {
             <span className="font-bold text-white text-base">Price Breakdown</span>
           </div>
           <div className="px-4 py-1">
-            <Row label={`PKR 2,500 × ${duration} hours`} value={`PKR ${Number(total).toLocaleString()}`} />
+            <Row label={`PKR 4,500 × ${duration} hours`} value={`PKR ${Number(total).toLocaleString()}`} />
             <Row label="Payment Method" value="Prepaid (online)" />
             <div className="flex items-center justify-between py-3">
               <span className="font-bold text-slate-900">Total</span>

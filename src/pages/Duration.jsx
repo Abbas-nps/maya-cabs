@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import Stepper from "../components/Stepper";
 
-const HOURLY_RATE = 2500;
+const HOURLY_RATE = 4500;
 
 const OPTIONS = [
   {
@@ -70,7 +70,7 @@ export default function Duration({ onNext, onBack }) {
             </svg>
           </div>
           <div>
-            <div className="font-bold text-slate-900">PKR 2,500 / hour</div>
+            <div className="font-bold text-slate-900">PKR 4,500 / hour</div>
             <div className="text-slate-500 text-xs">Includes driver assistance &amp; van hire</div>
           </div>
         </div>
@@ -157,7 +157,7 @@ export default function Duration({ onNext, onBack }) {
           className="w-full bg-teal-700 text-white font-bold text-base rounded-2xl py-4 hover:bg-teal-800 transition"
           onClick={() => {
             const existing = JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}");
-            localStorage.setItem("mayaCabsBooking", JSON.stringify({ ...existing, duration: selected, total: selected * 2500 }));
+            localStorage.setItem("mayaCabsBooking", JSON.stringify({ ...existing, duration: selected, total: selected * HOURLY_RATE }));
             if (onNext) onNext(selected); else navigate("/booking/schedule");
           }}
         >

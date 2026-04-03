@@ -20,7 +20,9 @@ export default function Landing() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex-1 flex flex-col bg-white">
+  <div className="min-h-screen bg-[#f5f7fb] flex justify-center py-6">
+    <div className="w-full max-w-[420px] bg-white rounded-[28px] overflow-hidden shadow-xl">
+      <div className="flex-1 flex flex-col bg-white">
       {/* Hero Section */}
       <div className="relative bg-teal-700 overflow-hidden">
         {/* Hero Image */}
@@ -220,7 +222,7 @@ export default function Landing() {
           <ArrowRight className="w-5 h-5" />
         </button>
         <p className="text-center text-slate-400 text-xs mt-2">
-            Minimum 2 hours • PKR 2,500/hr • Bank transfer
+            Minimum 2 hours • PKR 4,500/hr • Bank transfer
           </p>
       </div>
 
@@ -242,6 +244,8 @@ export default function Landing() {
           Operating since 2025.
         </p>
       </div>
+      </div>
+    </div>
     </div>
   );
 }

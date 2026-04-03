@@ -18,7 +18,10 @@ function formatDate(ds) {
 
 function buildWhatsAppMessage(booking) {
   const duration = booking.duration || "—";
-  const total = booking.total || (booking.duration ? booking.duration * 2500 : "—");
+  const durationHours = Number(booking.duration);
+  const total = Number.isFinite(durationHours) && durationHours > 0
+    ? durationHours * 4500
+    : (booking.total || "—");
   const date = formatDate(booking.date);
   const timeSlot = booking.slotTime && booking.slotEnd
     ? `${booking.slotTime} to ${booking.slotEnd}`
@@ -54,7 +57,10 @@ export default function Payment({ onBack }) {
   const [sent, setSent] = useState(false);
 
   const duration = booking.duration || "—";
-  const total = booking.total || (booking.duration ? booking.duration * 2500 : "—");
+  const durationHours = Number(booking.duration);
+  const total = Number.isFinite(durationHours) && durationHours > 0
+    ? durationHours * 4500
+    : (booking.total || "—");
   const date = formatDate(booking.date);
   const timeSlot =
     booking.slotTime && booking.slotEnd
