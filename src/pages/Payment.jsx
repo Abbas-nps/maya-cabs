@@ -10,7 +10,7 @@ import { SELECTED_CITY_KEY } from "./CitySelect";
 const WHATSAPP_NUMBER = "923396292222";
 const PENDING_BOOKING_QUEUE_KEY = "mayaCabsPendingBookingQueue";
 const DEFAULT_DRIVER_NAME = "Kaabish";
-const DEFAULT_VEHICLE_NAME = "2019 Nissan Clipper WAV";
+const DEFAULT_VEHICLE_NAME = "Nissan Clipper/Suzuki Every";
 const DEFAULT_OPERATOR_NAME = "New Pak Surgical";
 const MIN_SLOT_GAP_HOURS = 2;
 

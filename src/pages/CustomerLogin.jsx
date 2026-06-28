@@ -18,7 +18,7 @@ const BAN_THRESHOLD = 10;
 const LOCK_MINUTES = 15;
 const BAN_HOURS = 24;
 const DEFAULT_DRIVER_NAME = "Kaabish";
-const DEFAULT_VEHICLE_NAME = "2019 Nissan Clipper WAV";
+const DEFAULT_VEHICLE_NAME = "Nissan Clipper/Suzuki Every";
 const DEFAULT_OPERATOR_NAME = "New Pak Surgical";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

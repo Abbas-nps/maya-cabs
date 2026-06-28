@@ -244,9 +244,7 @@ function Metric({ label, value, subtitle, color }) {
 
 // ── Main export ───────────────────────────────────────────────────────────────
 export default function OperationsLog() {
-  const [unlocked, setUnlocked] = useState(
-    () => sessionStorage.getItem('ops_log_pin') === LOG_PIN
-  );
+  const [unlocked, setUnlocked] = useState(false);
 
   const [slotLog,  setSlotLog]  = useState([]);
   const [fuelLog,  setFuelLog]  = useState([]);
@@ -269,7 +267,6 @@ export default function OperationsLog() {
   }, []);
 
   function handleUnlock() {
-    sessionStorage.setItem('ops_log_pin', LOG_PIN);
     setUnlocked(true);
   }
 

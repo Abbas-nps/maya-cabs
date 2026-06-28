@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "../supabase";
 
-const CRM_SESSION_KEY = "mayaCabsCrmSession";
 const CRM_AUTH_KEY = "mayaCabsCrmAuth";
 const CRM_DATA_KEY = "mayaCabsCrmData";
 
@@ -415,15 +414,6 @@ function writeAuth(next) {
   writeJson(CRM_AUTH_KEY, next);
 }
 
-function readSession() {
-  return readJson(CRM_SESSION_KEY, null);
-}
-
-function writeSession(next) {
-  if (!next) localStorage.removeItem(CRM_SESSION_KEY);
-  else writeJson(CRM_SESSION_KEY, next);
-}
-
 function getUserAuthState(username) {
   const all = readAuth();
   return all[username] || { failedAttempts: 0, lockedUntil: null, bannedUntil: null };
@@ -542,7 +532,6 @@ function CrmLogin({ onLogin }) {
       role: result.user.role,
       loginAt: nowIso(),
     };
-    writeSession(session);
     onLogin(session);
   };
 
@@ -2045,7 +2034,7 @@ function CrmApp({ session, onLogout }) {
 }
 
 export default function Crm() {
-  const [session, setSession] = useState(() => readSession());
+  const [session, setSession] = useState(null);
 
   useEffect(() => {
     if (!session?.username) return;
@@ -2054,7 +2043,6 @@ export default function Crm() {
     const isBlocked = BLOCKED_USERS.includes(normalizedUsername);
     const isKnownUser = USERS.some((user) => user.username === normalizedUsername);
     if (isBlocked || !isKnownUser) {
-      writeSession(null);
       setSession(null);
     }
   }, [session]);
@@ -2074,7 +2062,6 @@ export default function Crm() {
         <CrmApp
           session={session}
           onLogout={() => {
-            writeSession(null);
             setSession(null);
           }}
         />

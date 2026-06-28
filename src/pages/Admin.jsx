@@ -49,12 +49,34 @@ const STATUS_COLORS = {
 
 const STATUS_OPTIONS = ["pending", "confirmed", "completed", "cancelled"];
 const DEFAULT_DRIVER_NAME = "Kaabish";
-const DEFAULT_VEHICLE_NAME = "2019 Nissan Clipper WAV";
+const DEFAULT_VEHICLE_NAME = "Nissan Clipper/Suzuki Every";
 const DEFAULT_OPERATOR_NAME = "New Pak Surgical";
-const VEHICLE_OPTIONS = ["2019 Nissan Clipper WAV"];
-const OPERATOR_OPTIONS = ["New Pak Surgical"];
+const VEHICLE_OPTIONS = ["Nissan Clipper/Suzuki Every"];
+const OPERATOR_OPTIONS = ["New Pak Surgical", "Gharib Nawaz"];
+const OPERATOR_DRIVER_OPTIONS = {
+  "New Pak Surgical": ["Taabish"],
+  "Gharib Nawaz": ["Muhammad Ibrahim"],
+};
 const CITY_OPTIONS = ["Lahore", "Karachi"];
 const MIN_SLOT_GAP_HOURS = 2;
+
+function normalizeVehicleName(value) {
+  const normalized = String(value || "").trim();
+  if (!normalized) return DEFAULT_VEHICLE_NAME;
+  if (/^2019 Nissan Clipper WAV$/i.test(normalized)) return DEFAULT_VEHICLE_NAME;
+  if (/^Nissan Clipper\/Suzuli Every$/i.test(normalized)) return DEFAULT_VEHICLE_NAME;
+  return normalized;
+}
+
+function getDriverOptionsForOperator(operatorName) {
+  const normalized = String(operatorName || "").trim();
+  return OPERATOR_DRIVER_OPTIONS[normalized] || [];
+}
+
+function getDefaultDriverForOperator(operatorName) {
+  const options = getDriverOptionsForOperator(operatorName);
+  return options[0] || DEFAULT_DRIVER_NAME;
+}
 
 function normalizeDuration(duration) {
   const value = Number(duration);
@@ -143,11 +165,13 @@ function getRideNumber(booking) {
 }
 
 function getDriverName(booking) {
-  return (booking.driver_name || "").trim() || DEFAULT_DRIVER_NAME;
+  const saved = (booking.driver_name || "").trim();
+  if (saved) return saved;
+  return getDefaultDriverForOperator(getOperatorName(booking));
 }
 
 function getVehicleName(booking) {
-  return (booking.vehicle_name || "").trim() || DEFAULT_VEHICLE_NAME;
+  return normalizeVehicleName(booking.vehicle_name);
 }
 
 function getOperatorName(booking) {
@@ -366,8 +390,9 @@ function BookingModal({ booking, onClose, onStatusChange, onBookingUpdate }) {
   const [saving, setSaving] = useState(false);
   const [slotSaving, setSlotSaving] = useState(false);
   const [slotError, setSlotError] = useState("");
-  const [vehicleName, setVehicleName] = useState(getVehicleName(booking));
+  const [vehicleName, setVehicleName] = useState(normalizeVehicleName(getVehicleName(booking)));
   const [operatorName, setOperatorName] = useState(getOperatorName(booking));
+  const [driverName, setDriverName] = useState(getDriverName(booking));
   const [operatorOptions, setOperatorOptions] = useState(() => {
     const existing = getOperatorName(booking);
     return existing && !OPERATOR_OPTIONS.includes(existing)
@@ -401,9 +426,26 @@ function BookingModal({ booking, onClose, onStatusChange, onBookingUpdate }) {
       || booking.slot_end !== selectedSlot.endLabel
     );
   const hasAssignmentChange =
+    driverName !== getDriverName(booking)
+    ||
     vehicleName !== getVehicleName(booking)
     || operatorName !== getOperatorName(booking)
     || cityName !== String(booking.city || "").trim();
+
+  useEffect(() => {
+    const available = getDriverOptionsForOperator(operatorName);
+    if (!available.length) return;
+    if (!available.includes(driverName)) {
+      setDriverName(getDefaultDriverForOperator(operatorName));
+    }
+  }, [operatorName, driverName]);
+
+  const driverOptions = useMemo(() => {
+    const base = getDriverOptionsForOperator(operatorName);
+    const current = String(driverName || "").trim();
+    if (current && !base.includes(current)) return [...base, current];
+    return base;
+  }, [operatorName, driverName]);
 
   const handleAddOperator = () => {
     const normalized = String(newOperatorName || "").trim();
@@ -508,7 +550,8 @@ function BookingModal({ booking, onClose, onStatusChange, onBookingUpdate }) {
     setAssignmentError("");
 
     const updates = {
-      vehicle_name: vehicleName || DEFAULT_VEHICLE_NAME,
+      driver_name: driverName || getDefaultDriverForOperator(operatorName),
+      vehicle_name: normalizeVehicleName(vehicleName),
       operator_name: operatorName || DEFAULT_OPERATOR_NAME,
       city: cityName || "Lahore",
     };
@@ -591,6 +634,18 @@ function BookingModal({ booking, onClose, onStatusChange, onBookingUpdate }) {
             <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Assignment</div>
             <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100 flex flex-col gap-2">
               <label className="text-xs font-semibold text-slate-600">Vehicle</label>
+              <label className="text-xs font-semibold text-slate-600">Driver</label>
+              <select
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800"
+                value={driverName}
+                onChange={(e) => setDriverName(e.target.value)}
+              >
+                {driverOptions.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+
+              <label className="text-xs font-semibold text-slate-600 mt-1">Vehicle</label>
               <select
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800"
                 value={vehicleName}
@@ -619,7 +674,7 @@ function BookingModal({ booking, onClose, onStatusChange, onBookingUpdate }) {
                   onClick={() => setAddingOperator(true)}
                   className="w-fit rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition"
                 >
-                  Add Operator
+                  Add Operator -
                 </button>
               ) : (
                 <div className="flex gap-2 items-center">
@@ -904,7 +959,8 @@ function ManualBookingPanel({ onBookingCreated }) {
   const [tripType, setTripType] = useState("one-way");
   const [wheelchairType, setWheelchairType] = useState("standard");
   const [status, setStatus] = useState("pending");
-  const [vehicleName, setVehicleName] = useState(DEFAULT_VEHICLE_NAME);
+  const [driverName, setDriverName] = useState(getDefaultDriverForOperator(DEFAULT_OPERATOR_NAME));
+  const [vehicleName, setVehicleName] = useState(normalizeVehicleName(DEFAULT_VEHICLE_NAME));
   const [operatorName, setOperatorName] = useState(DEFAULT_OPERATOR_NAME);
   const [operatorOptions, setOperatorOptions] = useState(OPERATOR_OPTIONS);
   const [newOperatorName, setNewOperatorName] = useState("");
@@ -923,6 +979,12 @@ function ManualBookingPanel({ onBookingCreated }) {
     && durationHoursValue > 0
     && hourlyRateValue >= 0;
   const calculatedTotalPkr = canCalculateTotal ? Math.round(durationHoursValue * hourlyRateValue) : null;
+  const manualDriverOptions = useMemo(() => {
+    const base = getDriverOptionsForOperator(operatorName);
+    const current = String(driverName || "").trim();
+    if (current && !base.includes(current)) return [...base, current];
+    return base;
+  }, [operatorName, driverName]);
 
   const handleAddOperator = () => {
     const normalized = String(newOperatorName || "").trim();
@@ -939,6 +1001,14 @@ function ManualBookingPanel({ onBookingCreated }) {
     }
   }, [selectedSlotId, manualSlotOptions]);
 
+  useEffect(() => {
+    const available = getDriverOptionsForOperator(operatorName);
+    if (!available.length) return;
+    if (!available.includes(driverName)) {
+      setDriverName(getDefaultDriverForOperator(operatorName));
+    }
+  }, [operatorName, driverName]);
+
   const resetForm = () => {
     setCity("Lahore");
     setPassengerName("");
@@ -952,7 +1022,8 @@ function ManualBookingPanel({ onBookingCreated }) {
     setTripType("one-way");
     setWheelchairType("standard");
     setStatus("pending");
-    setVehicleName(DEFAULT_VEHICLE_NAME);
+    setDriverName(getDefaultDriverForOperator(DEFAULT_OPERATOR_NAME));
+    setVehicleName(normalizeVehicleName(DEFAULT_VEHICLE_NAME));
     setOperatorName(DEFAULT_OPERATOR_NAME);
     setNewOperatorName("");
     setAddingOperator(false);
@@ -1022,7 +1093,8 @@ function ManualBookingPanel({ onBookingCreated }) {
       slot_end: selectedSlot.endLabel,
       duration: durationHoursValue,
       total_pkr: calculatedTotalPkr,
-      vehicle_name: vehicleName || DEFAULT_VEHICLE_NAME,
+      driver_name: driverName || getDefaultDriverForOperator(operatorName),
+      vehicle_name: normalizeVehicleName(vehicleName),
       operator_name: operatorName || DEFAULT_OPERATOR_NAME,
       status,
     };
@@ -1219,6 +1291,15 @@ function ManualBookingPanel({ onBookingCreated }) {
         </select>
         <select
           className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:border-teal-400"
+          value={driverName}
+          onChange={(e) => setDriverName(e.target.value)}
+        >
+          {manualDriverOptions.map((option) => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
+        <select
+          className="border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 outline-none focus:border-teal-400"
           value={vehicleName}
           onChange={(e) => setVehicleName(e.target.value)}
         >
@@ -1242,7 +1323,7 @@ function ManualBookingPanel({ onBookingCreated }) {
             onClick={() => setAddingOperator(true)}
             className="sm:col-span-2 w-fit rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition"
           >
-            Add Operator
+            Add Operator -
           </button>
         ) : (
           <div className="sm:col-span-2 flex flex-col sm:flex-row gap-2">
@@ -1467,9 +1548,7 @@ function BlockedDatesPanel({ blockedDates, onRefresh }) {
 
 // ── Main Admin Dashboard ──────────────────────────────────────────────────────
 export default function Admin() {
-  const [unlocked, setUnlocked] = useState(
-    sessionStorage.getItem("adminUnlocked") === "true"
-  );
+  const [unlocked, setUnlocked] = useState(false);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -1503,7 +1582,6 @@ export default function Admin() {
   }, [unlocked, fetchBookings, fetchBlockedDates]);
 
   const handleUnlock = () => {
-    sessionStorage.setItem("adminUnlocked", "true");
     setUnlocked(true);
   };
 
@@ -1570,7 +1648,6 @@ export default function Admin() {
             </button>
             <button
               onClick={() => {
-                sessionStorage.removeItem("adminUnlocked");
                 setUnlocked(false);
               }}
               className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center hover:bg-white/30 transition"
