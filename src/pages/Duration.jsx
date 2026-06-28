@@ -1,55 +1,58 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import Stepper from "../components/Stepper";
-
-const HOURLY_RATE = 4500;
+import PricingNoticeModal from "../components/PricingNoticeModal";
+import { getSlotPrice, CITY_RATES } from "../lib/pricing";
+import { SELECTED_CITY_KEY, getSelectedCitySlug } from "./CitySelect";
 
 const OPTIONS = [
   {
-    hours: 2,
-    label: "2 Hours",
-    tag: "Minimum",
+    hours: 6,
+    label: "6 Hours",
+    tag: "Flexible Start",
     tagColor: "bg-amber-100 text-amber-700",
-    desc: "Best for single appointments or short trips within the city.",
+    desc: "Choose any start time on a 24-hour clock. Duration is exactly 6 hours.",
     banner: null,
   },
   {
-    hours: 3,
-    label: "3 Hours",
-    tag: "Most Popular",
+    hours: 12,
+    label: "12 Hours",
+    tag: "Flexible Start",
     tagColor: "bg-teal-100 text-teal-700",
-    desc: "Ideal for hospital visits, multiple stops, or longer appointments.",
+    desc: "Choose any start time on a 24-hour clock. Duration is exactly 12 hours.",
     banner: "POPULAR",
-  },
-  {
-    hours: 4,
-    label: "4 Hours",
-    tag: "Extended",
-    tagColor: "bg-slate-100 text-slate-600",
-    desc: "For longer trips or multiple appointments in a day.",
-    banner: null,
-  },
-  {
-    hours: 10,
-    label: "10 Hours",
-    tag: "Full Day",
-    tagColor: "bg-indigo-100 text-indigo-700",
-    desc: "All-day dedicated van & driver — ideal for outstation trips, events, or full-day hospital stays.",
-    banner: "BEST VALUE",
   },
 ];
 
 export default function Duration({ onNext, onBack }) {
   const navigate = useNavigate();
-  const [selected, setSelected] = useState(2);
-  const total = selected * HOURLY_RATE;
+  const { citySlug } = useParams();
+  const [selected, setSelected] = useState(6);
+  const [noticeAccepted, setNoticeAccepted] = useState(false);
+  const [selectedCity, setSelectedCity] = useState(null);
+  
+  useEffect(() => {
+    const city = localStorage.getItem(SELECTED_CITY_KEY) || null;
+    setSelectedCity(city);
+  }, []);
+
+  useEffect(() => {
+    if (!citySlug) return;
+    const normalized = String(citySlug).trim().toLowerCase();
+    if (normalized === "lahore") localStorage.setItem(SELECTED_CITY_KEY, "Lahore");
+    if (normalized === "karachi") localStorage.setItem(SELECTED_CITY_KEY, "Karachi");
+    const nextCity = localStorage.getItem(SELECTED_CITY_KEY) || null;
+    setSelectedCity(nextCity);
+  }, [citySlug]);
+  
+  const total = getSlotPrice(selected, selectedCity) || 0;
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col">
       <TopBar
         title="Choose Duration"
-        subtitle="Minimum 2 hours \u2022 Hourly billing"
+        subtitle="6-hour or 12-hour slots only"
         showBack
         onBack={onBack || (() => navigate(-1))}
       />
@@ -57,7 +60,7 @@ export default function Duration({ onNext, onBack }) {
 
       <main className="flex-1 px-4 pt-5 pb-36">
         <h2 className="text-slate-900 font-extrabold text-2xl mb-1">How many hours do you need?</h2>
-        <p className="text-slate-500 text-sm mb-5">Select your booking duration. Billing is hourly.</p>
+        <p className="text-slate-500 text-sm mb-5">Select 6 or 12 hours. Start time is chosen on the next step.</p>
 
         {/* Price info card */}
         <div className="bg-white rounded-2xl px-4 py-3 flex items-center gap-3 mb-5 shadow-sm">
@@ -70,8 +73,9 @@ export default function Duration({ onNext, onBack }) {
             </svg>
           </div>
           <div>
-            <div className="font-bold text-slate-900">PKR 4,500 / hour</div>
-            <div className="text-slate-500 text-xs">Includes driver assistance &amp; van hire</div>
+            <div className="font-bold text-slate-900">6-Hour Slot: PKR {(getSlotPrice(6, selectedCity) || 15000).toLocaleString()}</div>
+            <div className="font-bold text-slate-900">12-Hour Slot: PKR {(getSlotPrice(12, selectedCity) || 30000).toLocaleString()}</div>
+            <div className="text-slate-500 text-xs">{selectedCity && <span>{selectedCity} · </span>}Price is fixed per slot</div>
           </div>
         </div>
 
@@ -115,9 +119,9 @@ export default function Duration({ onNext, onBack }) {
                       </span>
                     )}
                     <span className={`font-extrabold text-lg leading-tight ${isSelected ? "text-teal-700" : "text-slate-700"}`}>
-                      PKR {(opt.hours * HOURLY_RATE).toLocaleString()}
+                      PKR {(getSlotPrice(opt.hours, selectedCity) || 0).toLocaleString()}
                     </span>
-                    <span className="text-slate-400 text-xs">total</span>
+                    <span className="text-slate-400 text-xs">fixed total</span>
                   </div>
                 </div>
 
@@ -137,7 +141,7 @@ export default function Duration({ onNext, onBack }) {
                       </span>
                     ))}
                     <span className="text-teal-700 font-bold text-sm ml-1">
-                      = PKR {(opt.hours * HOURLY_RATE).toLocaleString()}
+                      = PKR {(getSlotPrice(opt.hours, selectedCity) || 0).toLocaleString()}
                     </span>
                   </div>
                 )}
@@ -154,16 +158,26 @@ export default function Duration({ onNext, onBack }) {
           <span className="font-extrabold text-teal-700 text-lg">PKR {total.toLocaleString()}</span>
         </div>
         <button
-          className="w-full bg-teal-700 text-white font-bold text-base rounded-2xl py-4 hover:bg-teal-800 transition"
+          disabled={!noticeAccepted}
+          className={[
+            "w-full font-bold text-base rounded-2xl py-4 transition",
+            noticeAccepted
+              ? "bg-teal-700 text-white hover:bg-teal-800"
+              : "bg-slate-200 text-slate-400 cursor-not-allowed",
+          ].join(" ")}
           onClick={() => {
+            if (!noticeAccepted) return;
             const existing = JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}");
-            localStorage.setItem("mayaCabsBooking", JSON.stringify({ ...existing, duration: selected, total: selected * HOURLY_RATE }));
-            if (onNext) onNext(selected); else navigate("/booking/schedule");
+            localStorage.setItem("mayaCabsBooking", JSON.stringify({ ...existing, duration: selected, total }));
+            const activeCitySlug = citySlug || getSelectedCitySlug();
+            if (onNext) onNext(selected); else navigate(`/booking/city/${activeCitySlug}/schedule`);
           }}
         >
           Continue to Schedule →
         </button>
       </div>
+
+      <PricingNoticeModal open={!noticeAccepted} onAcknowledge={() => setNoticeAccepted(true)} />
     </div>
   );
 }

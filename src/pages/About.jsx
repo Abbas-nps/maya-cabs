@@ -103,14 +103,14 @@ export default function About() {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-4 py-4 z-40">
         <button
           className="w-full bg-teal-700 text-white font-bold text-base rounded-2xl py-4 flex items-center justify-center gap-2 hover:bg-teal-800 transition"
-          onClick={() => navigate("/booking/duration")}
+          onClick={() => navigate("/booking/city")}
         >
           <svg viewBox="0 0 20 20" width={18} height={18} fill="none">
             <path d="M4 10l4 4 8-8" stroke="white" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           I Understand — Continue to Booking
         </button>
-        <p className="text-slate-400 text-xs text-center mt-2">Step 1 of 5: Choose your booking duration</p>
+        <p className="text-slate-400 text-xs text-center mt-2">Next: select your city</p>
       </div>
     </div>
   );

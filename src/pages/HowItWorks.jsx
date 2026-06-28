@@ -39,11 +39,11 @@ export default function HowItWorks() {
               {
                 step: "1",
                 title: "Choose Your Duration",
-                body: `Select how long you will need the van. Maya Cabs offers 2-hour, 3-hour, and 4-hour booking slots.
+                body: `Select the duration type you need. Maya Cabs offers 6-hour and 12-hour slots only.
 
-Each slot includes travel to the destination, waiting time, and the return journey.
+Pricing is fixed: 6-hour slot = PKR 15,000 and 12-hour slot = PKR 30,000.
 
-For nearby appointments, 2 hours may be sufficient. For longer consultations, therapy sessions, or appointments with uncertain waiting times, 3 or 4 hours is recommended. Once your slot begins, the van remains assigned to you until the booked time ends.`,
+Slots are exact-duration windows and cannot be extended once started.`,
               },
               {
                 step: "2",
@@ -55,7 +55,7 @@ For nearby appointments, 2 hours may be sufficient. For longer consultations, th
 • Blue (HELD) — temporarily reserved while another customer completes booking
 • Black — unavailable
 
-Choose the date and time that aligns with your appointment. We operate Monday to Saturday, 10:00 AM to 10:00 PM and require a minimum of 4 hours advance notice to ensure proper preparation and route planning.`,
+Choose the date and your preferred start time on a 24-hour clock. You can start at any hour as long as your selected 6-hour or 12-hour window is available.`,
               },
               {
                 step: "3",
@@ -66,9 +66,14 @@ Choose the date and time that aligns with your appointment. We operate Monday to
 • Pickup address
 • Destination
 • One-way or wait-and-return
+• Estimated round-trip distance (km)
 • Passenger name and contact number
 
-This information allows us to prepare the ramp, winch, and securement system appropriately. All details are used strictly for booking coordination.`,
+City-only distance caps apply:
+• 6-hour slot: up to 120 km total
+• 12-hour slot: up to 160 km total
+
+If your trip exceeds this limit, please contact Maya Cabs for a custom quote.`,
               },
               {
                 step: "4",
@@ -130,6 +135,13 @@ You will receive confirmation along with the driver and vehicle details. On the 
             className="block w-full bg-teal-700 text-white text-center font-bold text-lg rounded-2xl py-4 hover:bg-teal-800 transition"
           >
             Book a Ride Now →
+          </Link>
+
+          <Link
+            to="/policy-updates"
+            className="block w-full mt-3 text-center border border-slate-300 text-slate-700 font-semibold text-sm rounded-2xl py-3 hover:bg-slate-100 transition"
+          >
+            View Policy Change Log
           </Link>
         </main>
       </div>

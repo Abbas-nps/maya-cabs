@@ -1,7 +1,9 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import TopBar from "../components/TopBar";
 import Stepper from "../components/Stepper";
+import { calculateBookingTotalPkr, getDistanceCapKm, normalizeDuration } from "../lib/pricing";
+import { SELECTED_CITY_KEY, getSelectedCitySlug } from "./CitySelect";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DOW = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -25,26 +27,41 @@ function Row({ label, value, highlight }) {
 
 export default function Review({ onNext, onBack }) {
   const navigate = useNavigate();
+  const { citySlug } = useParams();
   const booking = JSON.parse(localStorage.getItem("mayaCabsBooking") || "{}");
+  const [selectedCity, setSelectedCity] = useState(null);
 
-  const duration = booking.duration || "—";
-  const durationHours = Number(booking.duration);
-  const total = Number.isFinite(durationHours) && durationHours > 0
-    ? durationHours * 4500
-    : (booking.total || "—");
+  useEffect(() => {
+    const city = localStorage.getItem(SELECTED_CITY_KEY) || null;
+    setSelectedCity(city);
+  }, []);
+
+  useEffect(() => {
+    if (!citySlug) return;
+    const normalized = String(citySlug).trim().toLowerCase();
+    if (normalized === "lahore") localStorage.setItem(SELECTED_CITY_KEY, "Lahore");
+    if (normalized === "karachi") localStorage.setItem(SELECTED_CITY_KEY, "Karachi");
+    setSelectedCity(localStorage.getItem(SELECTED_CITY_KEY) || null);
+  }, [citySlug]);
+
+  const durationValue = normalizeDuration(booking.duration);
+  const duration = durationValue || "—";
+  const distanceCapKm = getDistanceCapKm(durationValue, selectedCity);
+  const total = calculateBookingTotalPkr(booking.duration, selectedCity, booking.total);
   const date = formatDate(booking.date);
   const timeSlot = booking.slotTime && booking.slotEnd
     ? `${booking.slotTime} → ${booking.slotEnd}`
     : "—";
+  const city = booking.city || selectedCity || "—";
   const passenger = booking.fullName || "—";
   const phone = booking.phone || "—";
   const pickup = booking.pickup || "—";
   const destination = booking.destination || "—";
   const tripType = booking.tripType === "one-way" ? "One-Way" : booking.tripType === "wait-return" ? "Wait & Return" : "—";
   const wheelchair = booking.wheelchairType === "standard"
-    ? "Standard Width (up to 24 in)"
+    ? "Standard Width (under 28 in)"
     : booking.wheelchairType === "wide"
-    ? "Wide / Power Chair (up to 28 in)"
+    ? "Wide / Power Chair (28 in and above - on-call confirmation required)"
     : "—";
 
   return (
@@ -75,9 +92,11 @@ export default function Review({ onNext, onBack }) {
             <span className="font-bold text-white text-base">Trip Details</span>
           </div>
           <div className="px-4 py-1">
+            <Row label="City" value={city} />
             <Row label="Date" value={date} />
             <Row label="Time Slot" value={timeSlot} />
             <Row label="Duration" value={`${duration} hours`} />
+            <Row label="Distance Cap" value={`${distanceCapKm} km (city-only use)`} />
             <Row label="Pickup" value={pickup} />
             <Row label="Destination" value={destination} />
             <Row label="Trip Type" value={tripType} />
@@ -114,11 +133,12 @@ export default function Review({ onNext, onBack }) {
             <span className="font-bold text-white text-base">Price Breakdown</span>
           </div>
           <div className="px-4 py-1">
-            <Row label={`PKR 4,500 × ${duration} hours`} value={`PKR ${Number(total).toLocaleString()}`} />
+            <Row label={`${duration} Hour Slot`} value={total ? `PKR ${Number(total).toLocaleString()}` : "—"} />
             <Row label="Payment Method" value="Prepaid (online)" />
+            <Row label="Slot Policy" value="Exactly fixed duration • No extensions allowed" />
             <div className="flex items-center justify-between py-3">
               <span className="font-bold text-slate-900">Total</span>
-              <span className="font-extrabold text-teal-700 text-xl">PKR {Number(total).toLocaleString()}</span>
+              <span className="font-extrabold text-teal-700 text-xl">{total ? `PKR ${Number(total).toLocaleString()}` : "—"}</span>
             </div>
           </div>
         </div>
@@ -138,13 +158,14 @@ export default function Review({ onNext, onBack }) {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-4 py-4 z-40">
         <div className="flex items-center justify-between mb-3">
           <span className="text-slate-500 text-sm">Total payable</span>
-          <span className="font-extrabold text-teal-700 text-lg">PKR {Number(total).toLocaleString()}</span>
+          <span className="font-extrabold text-teal-700 text-lg">{total ? `PKR ${Number(total).toLocaleString()}` : "—"}</span>
         </div>
         <button
           className="w-full bg-teal-700 text-white font-bold text-base rounded-2xl py-4 hover:bg-teal-800 transition"
           onClick={() => {
+            const activeCitySlug = citySlug || getSelectedCitySlug();
             if (onNext) onNext();
-            else navigate("/booking/payment");
+            else navigate(`/booking/city/${activeCitySlug}/payment`);
           }}
         >
           Confirm &amp; Continue to Payment →

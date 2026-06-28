@@ -13,7 +13,7 @@ export default function Confirmed({ booking }) {
         <b>Estimated Cost:</b> PKR {booking.estimatedCost}<br />
       </div>
       <div style={{ marginTop: 20 }}>
-        <b>Need help?</b> <a href="https://wa.me/03396292222" target="_blank" rel="noopener noreferrer">WhatsApp Support</a>
+        <b>Need help?</b> <a href="https://wa.me/923396292222" target="_blank" rel="noopener noreferrer">WhatsApp Support</a>
       </div>
     </div>
   );

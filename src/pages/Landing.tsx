@@ -132,8 +132,8 @@ export default function Landing() {
           <FeatureCard
             icon={<Clock className="text-blue-600" size={22} />}
             color="blue"
-            title="Flexible Hourly Booking"
-            desc="Book 2, 3, or 4 hours. Pay per hour. Suitable for multiple stops or long appointments."
+            title="Fixed Slot Booking"
+            desc="Book either a 6-hour or 12-hour fixed slot with clear start/end times and fixed pricing."
           />
           <FeatureCard
             icon={<BadgeCheck className="text-emerald-600" size={22} />}
@@ -222,7 +222,7 @@ export default function Landing() {
           <ArrowRight className="w-5 h-5" />
         </button>
         <p className="text-center text-slate-400 text-xs mt-2">
-            Minimum 2 hours • PKR 4,500/hr • Bank transfer
+          6-Hour: PKR 15,000 • 12-Hour: PKR 30,000 • Bank transfer
           </p>
       </div>
 

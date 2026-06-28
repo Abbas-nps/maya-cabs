@@ -43,7 +43,7 @@ export const localBusinessSchema = {
         "Saturday",
       ],
       opens: "10:00",
-      closes: "22:00",
+      closes: "24:00",
     },
   ],
   hasOfferCatalog: {

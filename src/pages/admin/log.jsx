@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../supabase';
 
 // ── Change this to your preferred PIN ────────────────────────────────────────
-const LOG_PIN = '1122';
+const LOG_PIN = '6667';
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const T = {

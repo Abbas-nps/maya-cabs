@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const NOTICE_STORAGE_KEY = "mayaCabsPriceUpdateNoticeV1";
+const NOTICE_STORAGE_KEY = "mayaCabsPriceUpdateNoticeV2";
 
 export default function FuelPriceNotice() {
   const [open, setOpen] = useState(false);
@@ -42,13 +42,13 @@ export default function FuelPriceNotice() {
 
         <div className="px-4 py-4 text-sm text-slate-700 space-y-3">
           <p>
-            Our hourly fare has changed from <span className="font-bold">PKR 2,500</span> to <span className="font-bold">PKR 4,500</span> per hour.
+            Petrol price has changed from <span className="font-bold">PKR 458/L</span> to <span className="font-bold">PKR 378.41/L</span>.
           </p>
           <p>
-            Fuel price increased from <span className="font-bold">PKR 266/L</span> to <span className="font-bold">PKR 458/L</span> (about <span className="font-bold">75%</span>).
+            The revised rate per hour is <span className="font-bold">PKR 3,700</span>.
           </p>
           <p className="text-slate-600">
-            The same booking rules still apply.
+            Due to growing instability in petrol prices, rates are subject to change. If rates change, your booking will be charged at the updated price at the time of service.
           </p>
         </div>
 

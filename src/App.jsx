@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import AppRoutes from "./AppRoutes";
 import FuelPriceNotice from "./components/FuelPriceNotice";
+import CustomerSessionBadge from "./components/CustomerSessionBadge";
 import { localBusinessSchema } from "./seo/structuredData";
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
         />
         <FuelPriceNotice />
+        <CustomerSessionBadge />
         <AppRoutes />
       </BrowserRouter>
     </HelmetProvider>

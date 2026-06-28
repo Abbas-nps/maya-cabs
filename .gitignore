@@ -23,3 +23,8 @@ pnpm-debug.log*
 .env
 .env.local
 .env.*.local
+.env.migration         # service-role keys — never commit
+.env.migrated          # generated env with pro URL — add anon key before committing
+scripts/snapshots/     # raw data exports — may contain PII
+# Local Netlify folder
+.netlify

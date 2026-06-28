@@ -70,6 +70,12 @@ export default function Home() {
         >
           Book a Ride →
         </button>
+        <button
+          className="w-full bg-teal-800 text-white font-bold text-sm rounded-2xl py-3 border border-white/20 hover:bg-teal-900 transition"
+          onClick={() => navigate("/customer-login")}
+        >
+          Customer Login / Profile
+        </button>
         <p className="text-teal-200 text-xs text-center">Booking confirmed via WhatsApp • Min. 2 hours</p>
       </div>
 
@@ -81,6 +87,24 @@ export default function Home() {
         <p className="text-amber-800 text-sm">
           This is <span className="font-bold">NOT</span> an ambulance service. For medical emergencies, call <span className="font-bold">1122</span>.
         </p>
+      </div>
+
+      {/* Policy updates quick access */}
+      <div className="px-4 pt-4 pb-1">
+        <Link
+          to="/policy-updates"
+          className="block bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="text-slate-900 font-bold text-sm">Policy Updates & Change Timestamps</div>
+              <div className="text-slate-500 text-xs mt-1">
+                See what changed, when it changed, and why it changed.
+              </div>
+            </div>
+            <span className="text-teal-700 font-bold text-sm">View →</span>
+          </div>
+        </Link>
       </div>
 
       {/* Features */}
@@ -102,6 +126,15 @@ export default function Home() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="px-4 pb-6">
+        <div className="rounded-2xl border border-teal-100 bg-teal-50 p-4">
+          <h2 className="text-teal-900 font-bold text-base">Our Network Vision</h2>
+          <p className="text-teal-800 text-sm leading-relaxed mt-2">
+            Maya Cabs is building an accessible transportation framework in Pakistan and enabling owner-operators to expand this network across cities and provinces throughout Pakistan.
+          </p>
         </div>
       </div>
 
@@ -133,7 +166,7 @@ export default function Home() {
         <p className="text-slate-500 text-sm mb-5">Simple 4-step booking, confirmed via WhatsApp</p>
         <div className="flex flex-col gap-3">
           {[
-            { step: "1", title: "Choose Duration", desc: "Pick a 2, 3, or 4-hour time slot based on your appointment length" },
+            { step: "1", title: "Choose Duration", desc: "Pick a fixed 6-hour or 12-hour slot" },
             { step: "2", title: "Select Date & Time", desc: "View real-time availability and book your preferred slot" },
             { step: "3", title: "Enter Details", desc: "Pickup address, destination, wheelchair type, and passenger info" },
             { step: "4", title: "Confirm via WhatsApp", desc: "Booking sent to our team — confirmed and prepaid in minutes" },
@@ -214,6 +247,11 @@ export default function Home() {
             WhatsApp us
           </a>{" "}
           · +92 339 6292222
+        </p>
+        <p className="text-slate-500 text-xs text-center mt-2">
+          <Link to="/policy-updates" className="text-teal-700 font-semibold hover:underline">
+            View Policy Change Log
+          </Link>
         </p>
       </div>
     </div>

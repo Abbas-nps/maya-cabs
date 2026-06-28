@@ -9,10 +9,14 @@ function toYYYYMMDD(d) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-/** Build 60-min slots from 08:00 to 20:00 (last start 19:00) */
-function buildSlotsForDay(dateObj) {
+/** Build 60-min start slots where the booked trip ends no later than midnight. */
+function buildSlotsForDay(dateObj, durationHours = 2) {
   const slots = [];
-  for (let hour = 8; hour <= 19; hour++) {
+  const safeDuration = Math.max(1, Number(durationHours) || 2);
+  const firstStartHour = 8;
+  const lastStartHour = 24 - safeDuration;
+
+  for (let hour = firstStartHour; hour <= lastStartHour; hour++) {
     const start = new Date(dateObj);
     start.setHours(hour, 0, 0, 0);
 
@@ -78,7 +82,7 @@ export default function Step4Slots({
 
       const busyResult = await fetchBusyIntervals(dateStr);
       if (busyResult.error) throw busyResult.error;
-      const slots = buildSlotsForDay(dateObj);
+      const slots = buildSlotsForDay(dateObj, booking?.duration);
       return filterSlots(slots, busyResult.data, new Date());
     }
 
@@ -131,7 +135,7 @@ export default function Step4Slots({
     return () => {
       alive = false;
     };
-  }, [selectedDate]);
+  }, [selectedDate, booking?.duration]);
 
   if (!routeServiceable) {
     return (
