@@ -268,13 +268,15 @@ async function updateBookingRecord(id, payload) {
       return { data: null, error: latestError || { message: "No assignment fields available to update." } };
     }
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("bookings")
       .update(attemptPayload)
-      .eq("id", id);
+      .eq("id", id)
+      .select("*")
+      .single();
 
     if (!error) {
-      return { data: null, error: null, appliedPayload: attemptPayload };
+      return { data: data || null, error: null, appliedPayload: attemptPayload };
     }
 
     latestError = error;
@@ -444,6 +446,7 @@ function BookingModal({ booking, onClose, onStatusChange, onBookingUpdate }) {
     const base = getDriverOptionsForOperator(operatorName);
     const current = String(driverName || "").trim();
     if (current && !base.includes(current)) return [...base, current];
+    if (!base.length) return [getDefaultDriverForOperator(operatorName)];
     return base;
   }, [operatorName, driverName]);
 
@@ -549,10 +552,13 @@ function BookingModal({ booking, onClose, onStatusChange, onBookingUpdate }) {
     setAssignmentSaving(true);
     setAssignmentError("");
 
+    const normalizedOperator = String(operatorName || "").trim() || DEFAULT_OPERATOR_NAME;
+    const normalizedDriver = String(driverName || "").trim() || getDefaultDriverForOperator(normalizedOperator);
+
     const updates = {
-      driver_name: driverName || getDefaultDriverForOperator(operatorName),
+      driver_name: normalizedDriver,
       vehicle_name: normalizeVehicleName(vehicleName),
-      operator_name: operatorName || DEFAULT_OPERATOR_NAME,
+      operator_name: normalizedOperator,
       city: cityName || "Lahore",
     };
 
