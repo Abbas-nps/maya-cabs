@@ -262,6 +262,7 @@ async function insertBookingRecord(payload) {
 async function updateBookingRecord(id, payload) {
   let attemptPayload = { ...payload };
   let latestError = null;
+  const droppedFields = new Set();
 
   for (let attempt = 0; attempt < 4; attempt += 1) {
     if (Object.keys(attemptPayload).length === 0) {
@@ -285,10 +286,11 @@ async function updateBookingRecord(id, payload) {
     }
 
     const missingColumns = getMissingAssignmentColumns(String(error?.message || ""));
+    missingColumns.forEach((field) => droppedFields.add(field));
     attemptPayload = stripAssignmentFields(attemptPayload, missingColumns);
   }
 
-  return { data: null, error: latestError };
+  return { data: null, error: latestError, droppedFields: Array.from(droppedFields) };
 }
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -562,12 +564,36 @@ function BookingModal({ booking, onClose, onStatusChange, onBookingUpdate }) {
       city: cityName || "Lahore",
     };
 
-    const { data, error: updateError, appliedPayload } = await updateBookingRecord(booking.id, updates);
+    const { data, error: updateError, appliedPayload, droppedFields = [] } = await updateBookingRecord(booking.id, updates);
 
     setAssignmentSaving(false);
 
     if (updateError) {
       setAssignmentError(getAssignmentUpdateError(updateError));
+      return;
+    }
+
+    if (droppedFields.length > 0) {
+      setAssignmentError("Some assignment fields are not present in Supabase yet. Run the bookings migration SQL scripts first.");
+      return;
+    }
+
+    const persisted = data || { ...booking, ...(appliedPayload || {}) };
+    const expected = {
+      driver_name: updates.driver_name,
+      vehicle_name: updates.vehicle_name,
+      operator_name: updates.operator_name,
+      city: updates.city,
+    };
+
+    const mismatch = Object.entries(expected).some(([field, expectedValue]) => {
+      const actual = String(persisted?.[field] || "").trim();
+      const target = String(expectedValue || "").trim();
+      return actual !== target;
+    });
+
+    if (mismatch) {
+      setAssignmentError("Assignment was submitted but did not persist. Check Supabase table columns and update policies for driver_name and operator_name.");
       return;
     }
 
